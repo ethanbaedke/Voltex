@@ -1,3 +1,4 @@
+#include "vxpch.h"
 #include "Console.h"
 
 #include <iostream>

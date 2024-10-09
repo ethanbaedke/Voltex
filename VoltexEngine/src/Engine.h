@@ -1,11 +1,10 @@
 #pragma once
+#include "vxpch.h"
 
 namespace VoltexEngine {
 
 	/* 
-	* This is the class that runs an instance of the engine
-	* The engine is a tool used to make content for the project
-	* It is also a collection of classes that can be used within the project
+	* The "Voltex Engine" is a set of classes meant to abstract complex logic so applications can be developed at a higher level
 	*/
 	class Engine
 	{

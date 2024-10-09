@@ -10,15 +10,29 @@ workspace "Voltex"
         targetdir "bin/release"
         objdir "bin-int/release"
 
-project "VoltexProject"
-    location "VoltexProject"
+project "VoltexEngine"
+        location "VoltexEngine"
+        kind "StaticLib"
+        language "C++"
+    
+        pchheader "vxpch.h"
+        pchsource "VoltexEngine/src/vxpch.cpp"
+    
+        files
+        {
+            "VoltexEngine/src/**.h",
+            "VoltexEngine/src/**.cpp"
+        }
+
+project "VoltexGame"
+    location "VoltexGame"
     kind "ConsoleApp"
     language "C++"
 
     files
     {
-        "VoltexProject/src/**.h",
-        "VoltexProject/src/**.cpp"
+        "VoltexGame/src/**.h",
+        "VoltexGame/src/**.cpp"
     }
 
     links
@@ -29,15 +43,4 @@ project "VoltexProject"
     includedirs
     {
         "VoltexEngine/src"
-    }
-
-project "VoltexEngine"
-    location "VoltexEngine"
-    kind "StaticLib"
-    language "C++"
-
-    files
-    {
-        "VoltexEngine/src/**.h",
-        "VoltexEngine/src/**.cpp"
     }

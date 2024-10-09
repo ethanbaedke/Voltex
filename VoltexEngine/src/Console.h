@@ -1,6 +1,5 @@
 #pragma once
-
-#include <string>
+#include "vxpch.h"
 
 #define VX_LOG(x) VoltexEngine::Console::Log(std::string("\033[38;2;255;255;255m") + x)
 #define VX_WARNING(x) VoltexEngine::Console::Log(std::string("\033[38;2;255;255;0m") + x)

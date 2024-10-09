@@ -1,7 +1,5 @@
 #include "VoltexEngine.h"
 
-#include <memory>
-
 int main()
 {
 	// Make the engine
