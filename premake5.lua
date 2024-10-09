@@ -31,7 +31,7 @@ workspace "Voltex"
         }
 
 project "GLFW"
-    location "VoltexEngine/GLFW"
+    location "GLFW"
     kind "StaticLib"
     language "C"
 
@@ -54,7 +54,7 @@ project "GLFW"
     }
 
 project "GLAD"
-    location "VoltexEngine/GLAD"
+    location "GLAD"
     kind "StaticLib"
     language "C"
 
