@@ -1,11 +1,11 @@
 #include "Engine.h"
-#include <iostream>
+#include "Console.h"
 
 namespace VoltexEngine {
 
 	Engine::Engine()
 	{
-		std::cout << "Engine Initialized" << std::endl;
+		VX_LOG("Engine Initialized");
 	}
 
 	void Engine::Run()
