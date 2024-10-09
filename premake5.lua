@@ -37,14 +37,14 @@ project "GLFW"
 
     files
     {
-        "VoltexEngine/GLFW/src/*.h",
-        "VoltexEngine/GLFW/src/*.c",
-        "VoltexEngine/GLFW/include/GLFW/*.h",
+        "GLFW/src/*.h",
+        "GLFW/src/*.c",
+        "GLFW/include/GLFW/*.h",
     }
 
     includedirs
     {
-        "VoltexEngine/GLFW/include"
+        "GLFW/include"
     }
 
     defines
@@ -60,14 +60,13 @@ project "GLAD"
 
     files
     {
-        "VoltexEngine/GLAD/src/gl.c",
-        "VoltexEngine/GLAD/include/glad/gl.h",
-        "VoltexEngine/GLAD/include/KHR/khrplatform.h"
+        "GLAD/src/gl.c",
+        "GLAD/include/glad/gl.h",
     }
 
     includedirs
     {
-        "VoltexEngine/GLAD/include"
+        "GLAD/include"
     }
 
 project "VoltexEngine"
@@ -87,8 +86,8 @@ project "VoltexEngine"
     includedirs
     {
         "VoltexEngine/src",
-        "VoltexEngine/GLFW/include",
-        "VoltexEngine/GLAD/include"
+        "GLFW/include",
+        "GLAD/include"
     }
 
     links
@@ -117,8 +116,8 @@ project "VoltexGame"
     includedirs
     {
         "VoltexEngine/src",
-        "VoltexEngine/GLFW/include",
-        "VoltexEngine/GLAD/include"
+        "GLFW/include",
+        "GLAD/include"
     }
 
     links
