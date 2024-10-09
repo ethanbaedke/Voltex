@@ -1,5 +1,5 @@
 #pragma once
 #include "vxpch.h"
 
-#include "Engine.h"
-#include "Console.h"
+#include "Engine/Application.h"
+#include "Engine/Console.h"
