@@ -6,7 +6,7 @@
 namespace VoltexEngine {
 
 	Application::Application()
-		: m_Window(std::make_unique<Window>("Voltex Window", 1280, 720))
+		: m_Window(std::make_unique<Window>("Voltex Window", 800, 600))
 	{
 		VX_LOG("Application Initialized");
 	}
@@ -15,6 +15,7 @@ namespace VoltexEngine {
 	{
 		while (true)
 		{
+			m_Window->Update(1.f/60.f);
 		}
 	}
 

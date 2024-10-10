@@ -23,6 +23,8 @@ namespace VoltexEngine {
 		Window(const std::string& name, int width, int height);
 		~Window();
 
+		void Update(float deltaTime);
+
 	};
 
 }
