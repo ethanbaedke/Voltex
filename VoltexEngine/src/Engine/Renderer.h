@@ -31,9 +31,6 @@ namespace VoltexEngine {
 		/* TESTING ONLY: Draws a triangle to the screen */
 		static void DrawTriangle();
 
-		/* Returns a string that is the text of a shader file */
-		static std::string ReadShader(const std::string& name);
-
 		/* Called when an engine window is created */
 		static void WindowCreatedCallback(Window* window);
 

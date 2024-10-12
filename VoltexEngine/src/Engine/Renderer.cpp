@@ -2,8 +2,7 @@
 #include "Renderer.h"
 
 #include "Console.h"
-
-#include <fstream>
+#include "FileLoader.h"
 
 namespace VoltexEngine {
 
@@ -101,32 +100,6 @@ namespace VoltexEngine {
 		glEnableVertexAttribArray(vertexInTexCoords);
 	}
 
-	std::string Renderer::ReadShader(const std::string& name)
-	{
-		// Set the file path and open the file
-		std::string path = "../VoltexEngine/src/Shaders/" + name;
-		std::fstream file(path);
-
-		// Make sure the file was opened correctly
-		if (!file.is_open())
-		{
-			VX_WARNING("Could not find file: " + path);
-			return "";
-		}
-
-		// Read the contents of the file
-		std::string contents;
-		std::string line;
-		while (std::getline(file, line))
-		{
-			contents += (line + "\n");
-		}
-
-		// Close the file and return the contents
-		file.close();
-		return contents;
-	}
-
 	void Renderer::WindowCreatedCallback(Window* window)
 	{
 		if (s_GLWindow)
@@ -191,7 +164,7 @@ namespace VoltexEngine {
 
 		// Load the shaders
 		std::string vertexName = "Basic.vert";
-		std::string vertexSource = ReadShader(vertexName);
+		std::string vertexSource = FileLoader::LoadShader(vertexName);
 
 		GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 		const char* vertexCStr = vertexSource.c_str();
@@ -208,7 +181,7 @@ namespace VoltexEngine {
 		}
 
 		std::string fragmentName = "Basic.frag";
-		std::string fragmentSource = ReadShader(fragmentName);
+		std::string fragmentSource = FileLoader::LoadShader(fragmentName);
 
 		GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 		const char* fragmentCStr = fragmentSource.c_str();
