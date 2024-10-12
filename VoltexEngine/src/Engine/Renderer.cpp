@@ -49,7 +49,7 @@ namespace VoltexEngine {
 		GLFWwindow* currentWindow = glfwGetCurrentContext();
 		if (!glfwWindowShouldClose(currentWindow))
 		{
-			glDrawArrays(GL_TRIANGLES, 0, 3);
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 			glfwSwapBuffers(currentWindow);
 			glfwPollEvents();
 		}
@@ -58,19 +58,33 @@ namespace VoltexEngine {
 	void Renderer::DrawTriangle()
 	{
 		// Set the vertices
-		float vertices[] = {
-			0.0f, 0.5f,
-			0.5f, -0.5f,
-			-0.5f, -0.5f
+		GLfloat vertices[] = {
+			-0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
+			0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+			0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
+			-0.5f, 0.5f, 1.0f, 0.0f, 1.0f
 		};
 
-		// Load these verts into the vertex buffer
+		GLuint elements[] = {
+			0, 1, 2,
+			2, 3, 0
+		};
+
+		// Load verts into the vertex buffer
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-		// Get the position attribute off the shaders and set the rules for populating it with the data
-		GLint positionAttribute = glGetAttribLocation(s_ShaderProgram, "position");
-		glVertexAttribPointer(positionAttribute, 2, GL_FLOAT, GL_FALSE, 0, 0);
-		glEnableVertexAttribArray(positionAttribute);
+		// Load elements into the element buffer
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
+
+		// Set the position on the vertex
+		GLint vertexInPosition = glGetAttribLocation(s_ShaderProgram, "inPosition");
+		glVertexAttribPointer(vertexInPosition, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
+		glEnableVertexAttribArray(vertexInPosition);
+
+		// Set the color on the vertex
+		GLint vertexInColor = glGetAttribLocation(s_ShaderProgram, "inColor");
+		glVertexAttribPointer(vertexInColor, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(2 * sizeof(float)));
+		glEnableVertexAttribArray(vertexInColor);
 	}
 
 	std::string Renderer::ReadShader(const std::string& name)
@@ -144,6 +158,11 @@ namespace VoltexEngine {
 		GLuint vbo;
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+		// The window will use a single element buffer object
+		GLuint ebo;
+		glGenBuffers(1, &ebo);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
 		// Load the shaders
 		std::string vertexName = "Basic.vert";
