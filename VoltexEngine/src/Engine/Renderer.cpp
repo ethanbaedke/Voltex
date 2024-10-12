@@ -2,7 +2,8 @@
 #include "Renderer.h"
 
 #include "Console.h"
-#include "ShaderLoader.h"
+
+#include <fstream>
 
 namespace VoltexEngine {
 
@@ -10,6 +11,7 @@ namespace VoltexEngine {
 	bool Renderer::s_Initialized = false;
 	Window* Renderer::s_EngineWindow;
 	GLFWwindow* Renderer::s_GLWindow;
+	GLuint Renderer::s_ShaderProgram;
 
 	bool Renderer::Init()
 	{
@@ -55,47 +57,6 @@ namespace VoltexEngine {
 
 	void Renderer::DrawTriangle()
 	{
-		// Load the shaders
-		std::string vertexName = "Basic.vert";
-		std::string vertexSource = ShaderLoader::Load(vertexName);
-
-		GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		const char* vertexCStr = vertexSource.c_str();
-		glShaderSource(vertexShader, 1, &vertexCStr, NULL);
-		glCompileShader(vertexShader);
-
-		GLint status;
-		glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &status);
-		if (status == GL_FALSE)
-		{
-			char buffer[512];
-			glGetShaderInfoLog(vertexShader, 512, NULL, buffer);
-			VX_ERROR("Error compiling \"" + vertexName + "\":\n" + buffer);
-		}
-
-		std::string fragmentName = "Basic.frag";
-		std::string fragmentSource = ShaderLoader::Load(fragmentName);
-
-		GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-		const char* fragmentCStr = fragmentSource.c_str();
-		glShaderSource(fragmentShader, 1, &fragmentCStr, NULL);
-		glCompileShader(fragmentShader);
-
-		glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &status);
-		if (status == GL_FALSE)
-		{
-			char buffer[512];
-			glGetShaderInfoLog(fragmentShader, 512, NULL, buffer);
-			VX_ERROR("Error compiling \"" + fragmentName + "\":\n" + buffer);
-		}
-
-		GLuint shaderProgram = glCreateProgram();
-		glAttachShader(shaderProgram, vertexShader);
-		glAttachShader(shaderProgram, fragmentShader);
-
-		glLinkProgram(shaderProgram);
-		glUseProgram(shaderProgram);
-
 		// Set the vertices
 		float vertices[] = {
 			0.0f, 0.5f,
@@ -107,9 +68,35 @@ namespace VoltexEngine {
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
 		// Get the position attribute off the shaders and set the rules for populating it with the data
-		GLint positionAttribute = glGetAttribLocation(shaderProgram, "position");
+		GLint positionAttribute = glGetAttribLocation(s_ShaderProgram, "position");
 		glVertexAttribPointer(positionAttribute, 2, GL_FLOAT, GL_FALSE, 0, 0);
 		glEnableVertexAttribArray(positionAttribute);
+	}
+
+	std::string Renderer::ReadShader(const std::string& name)
+	{
+		// Set the file path and open the file
+		std::string path = "../VoltexEngine/src/Shaders/" + name;
+		std::fstream file(path);
+
+		// Make sure the file was opened correctly
+		if (!file.is_open())
+		{
+			VX_WARNING("Could not find file: " + path);
+			return "";
+		}
+
+		// Read the contents of the file
+		std::string contents;
+		std::string line;
+		while (std::getline(file, line))
+		{
+			contents += (line + "\n");
+		}
+
+		// Close the file and return the contents
+		file.close();
+		return contents;
 	}
 
 	void Renderer::WindowCreatedCallback(Window* window)
@@ -157,6 +144,47 @@ namespace VoltexEngine {
 		GLuint vbo;
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+		// Load the shaders
+		std::string vertexName = "Basic.vert";
+		std::string vertexSource = ReadShader(vertexName);
+
+		GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+		const char* vertexCStr = vertexSource.c_str();
+		glShaderSource(vertexShader, 1, &vertexCStr, NULL);
+		glCompileShader(vertexShader);
+
+		GLint status;
+		glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &status);
+		if (status == GL_FALSE)
+		{
+			char buffer[512];
+			glGetShaderInfoLog(vertexShader, 512, NULL, buffer);
+			VX_ERROR("Error compiling \"" + vertexName + "\":\n" + buffer);
+		}
+
+		std::string fragmentName = "Basic.frag";
+		std::string fragmentSource = ReadShader(fragmentName);
+
+		GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+		const char* fragmentCStr = fragmentSource.c_str();
+		glShaderSource(fragmentShader, 1, &fragmentCStr, NULL);
+		glCompileShader(fragmentShader);
+
+		glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &status);
+		if (status == GL_FALSE)
+		{
+			char buffer[512];
+			glGetShaderInfoLog(fragmentShader, 512, NULL, buffer);
+			VX_ERROR("Error compiling \"" + fragmentName + "\":\n" + buffer);
+		}
+
+		s_ShaderProgram = glCreateProgram();
+		glAttachShader(s_ShaderProgram, vertexShader);
+		glAttachShader(s_ShaderProgram, fragmentShader);
+
+		glLinkProgram(s_ShaderProgram);
+		glUseProgram(s_ShaderProgram);
 
 		// TESTING ONLY
 		DrawTriangle();
