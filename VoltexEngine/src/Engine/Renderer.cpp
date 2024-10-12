@@ -59,15 +59,21 @@ namespace VoltexEngine {
 	{
 		// Set the vertices
 		GLfloat vertices[] = {
-			-0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-			0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-			0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
-			-0.5f, 0.5f, 1.0f, 0.0f, 1.0f
+		//	Position		Color				TexCoords
+			-0.5f, -0.5f,	1.0f, 0.0f, 0.0f,	0.0f, 64.0f,
+			0.5f, -0.5f,	0.0f, 1.0f, 0.0f,	64.0f, 64.0f,
+			0.5f, 0.5f,		0.0f, 1.0f, 1.0f,	64.0f, 0.0f,
+			-0.5f, 0.5f,	1.0f, 0.0f, 1.0f,	0.0f, 0.0f
 		};
 
 		GLuint elements[] = {
 			0, 1, 2,
 			2, 3, 0
+		};
+
+		GLfloat pixels[] = {
+			0.0f, 0.0f, 0.0f,	1.0f, 1.0f, 1.0f,
+			1.0f, 1.0f, 1.0f,	0.0f, 0.0f, 0.0f
 		};
 
 		// Load verts into the vertex buffer
@@ -76,15 +82,23 @@ namespace VoltexEngine {
 		// Load elements into the element buffer
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
 
+		// Load pixels as a texture
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGB, GL_FLOAT, pixels);
+
 		// Set the position on the vertex
 		GLint vertexInPosition = glGetAttribLocation(s_ShaderProgram, "inPosition");
-		glVertexAttribPointer(vertexInPosition, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
+		glVertexAttribPointer(vertexInPosition, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), 0);
 		glEnableVertexAttribArray(vertexInPosition);
 
 		// Set the color on the vertex
 		GLint vertexInColor = glGetAttribLocation(s_ShaderProgram, "inColor");
-		glVertexAttribPointer(vertexInColor, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(2 * sizeof(float)));
+		glVertexAttribPointer(vertexInColor, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(2 * sizeof(float)));
 		glEnableVertexAttribArray(vertexInColor);
+
+		// Set the texture coordinates on the vertex
+		GLint vertexInTexCoords = glGetAttribLocation(s_ShaderProgram, "inTexCoords");
+		glVertexAttribPointer(vertexInTexCoords, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(5 * sizeof(float)));
+		glEnableVertexAttribArray(vertexInTexCoords);
 	}
 
 	std::string Renderer::ReadShader(const std::string& name)
@@ -163,6 +177,17 @@ namespace VoltexEngine {
 		GLuint ebo;
 		glGenBuffers(1, &ebo);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+
+		// The window will use a single texture
+		GLuint tex;
+		glGenTextures(1, &tex);
+		glBindTexture(GL_TEXTURE_2D, tex);
+
+		// Set texture parameters
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 		// Load the shaders
 		std::string vertexName = "Basic.vert";
