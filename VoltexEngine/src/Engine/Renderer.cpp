@@ -55,7 +55,7 @@ namespace VoltexEngine {
 	void Renderer::Tick(float deltaTime)
 	{
 		GLFWwindow* currentWindow = glfwGetCurrentContext();
-		if (!glfwWindowShouldClose(currentWindow))
+		if (currentWindow && !glfwWindowShouldClose(currentWindow))
 		{
 			glClearColor(0.13f, 0.16f, 0.27f, 1.0f); // Navy blue
 			glClear(GL_COLOR_BUFFER_BIT);

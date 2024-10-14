@@ -4,6 +4,8 @@
 #include "Renderer.h"
 #include "Console.h"
 
+#include "Vector.h"
+
 namespace VoltexEngine {
 
 	Application::Application()
@@ -12,7 +14,13 @@ namespace VoltexEngine {
 		if (!Renderer::Init())
 			return;
 
-		m_Window = std::make_unique<Window>("Voltex Window", 1920, 1080);
+		//m_Window = std::make_unique<Window>("Voltex Window", 1920, 1080);
+
+		Vector v1(2, 1);
+		Vector v2(1, 2);
+		Vector v3 = v1.Dot(v2);
+
+		VX_LOG(std::to_string(v3.X()));
 
 		VX_LOG("Application Initialized");
 	}
