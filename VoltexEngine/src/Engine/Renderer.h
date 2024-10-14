@@ -15,7 +15,7 @@ namespace VoltexEngine {
 
 		static bool s_Initialized;
 
-		static Window* s_EngineWindow;
+		static std::weak_ptr<Window> s_EngineWindow;
 		static GLFWwindow* s_GLWindow;
 
 		static GLuint s_ShaderProgram;
@@ -32,7 +32,7 @@ namespace VoltexEngine {
 		static void DrawTriangle();
 
 		/* Called when an engine window is created */
-		static void WindowCreatedCallback(Window* window);
+		static void WindowCreatedCallback(std::weak_ptr<Window> window);
 
 	};
 

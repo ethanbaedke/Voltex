@@ -15,7 +15,7 @@ namespace VoltexEngine {
 
 	// Declare/Define static variables
 	bool Renderer::s_Initialized = false;
-	Window* Renderer::s_EngineWindow;
+	std::weak_ptr<Window> Renderer::s_EngineWindow;
 	GLFWwindow* Renderer::s_GLWindow;
 	GLuint Renderer::s_ShaderProgram;
 
@@ -43,7 +43,7 @@ namespace VoltexEngine {
 		glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
 		// Add a callback for a window being created
-		Window::s_OnWindowCreated.AddCallback([&](Window* window) { WindowCreatedCallback(window); });
+		Window::s_OnWindowCreated.AddCallback([&](std::weak_ptr<Window> window) { WindowCreatedCallback(window); });
 
 		s_Initialized = true;
 		VX_LOG("Renderer initialized");
@@ -118,7 +118,7 @@ namespace VoltexEngine {
 		glEnableVertexAttribArray(vertexInTexCoords);
 	}
 
-	void Renderer::WindowCreatedCallback(Window* window)
+	void Renderer::WindowCreatedCallback(std::weak_ptr<Window> window)
 	{
 		if (s_GLWindow)
 		{
@@ -126,103 +126,111 @@ namespace VoltexEngine {
 			return;
 		}
 
-		s_EngineWindow = window;
-
-		// Create a GLFW window
-		s_GLWindow = glfwCreateWindow(window->GetWidth(), window->GetHeight(), window->GetName().c_str(), nullptr, nullptr);
-		if (!s_GLWindow)
+		// Make sure the window exists
+		if (std::shared_ptr<Window> sharedWin = window.lock())
 		{
-			VX_ERROR("Failed to create GLFW window");
+			s_EngineWindow = window;
+
+			// Create a GLFW window
+			s_GLWindow = glfwCreateWindow(sharedWin->GetWidth(), sharedWin->GetHeight(), sharedWin->GetName().c_str(), nullptr, nullptr);
+			if (!s_GLWindow)
+			{
+				VX_ERROR("Failed to create GLFW window");
+			}
+
+			// Make this window the current window context
+			glfwMakeContextCurrent(s_GLWindow);
+
+			// Load GLAD
+			if (!gladLoadGL(glfwGetProcAddress))
+			{
+				VX_ERROR("Failed to load GLAD");
+				return;
+			}
+			VX_LOG("GLAD loaded");
+
+			/*
+			* IF RENDERING GETS SLOW, LOOK HERE!
+			*
+			* Rather than creating different VAOs and buffers, we are using one for everything
+			* This is not the "correct" way to handle rendering, but I don't want to get trapped in premature optimization
+			* Once frames begin to drop, this should be the first place that is looked at for optimization
+			*/
+
+			// The window will use a single vertex array object
+			GLuint vao;
+			glGenVertexArrays(1, &vao);
+			glBindVertexArray(vao);
+
+			// The window will use a single vertex buffer object
+			GLuint vbo;
+			glGenBuffers(1, &vbo);
+			glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+			// The window will use a single element buffer object
+			GLuint ebo;
+			glGenBuffers(1, &ebo);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+
+			// The window will use a single texture
+			GLuint tex;
+			glGenTextures(1, &tex);
+			glBindTexture(GL_TEXTURE_2D, tex);
+
+			// Set texture parameters
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+			// Load the shaders
+			std::string vertexName = "Basic.vert";
+			std::string vertexSource = FileLoader::LoadShader(vertexName);
+
+			GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+			const char* vertexCStr = vertexSource.c_str();
+			glShaderSource(vertexShader, 1, &vertexCStr, NULL);
+			glCompileShader(vertexShader);
+
+			GLint status;
+			glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &status);
+			if (status == GL_FALSE)
+			{
+				char buffer[512];
+				glGetShaderInfoLog(vertexShader, 512, NULL, buffer);
+				VX_ERROR("Error compiling \"" + vertexName + "\":\n" + buffer);
+			}
+
+			std::string fragmentName = "Basic.frag";
+			std::string fragmentSource = FileLoader::LoadShader(fragmentName);
+
+			GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+			const char* fragmentCStr = fragmentSource.c_str();
+			glShaderSource(fragmentShader, 1, &fragmentCStr, NULL);
+			glCompileShader(fragmentShader);
+
+			glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &status);
+			if (status == GL_FALSE)
+			{
+				char buffer[512];
+				glGetShaderInfoLog(fragmentShader, 512, NULL, buffer);
+				VX_ERROR("Error compiling \"" + fragmentName + "\":\n" + buffer);
+			}
+
+			s_ShaderProgram = glCreateProgram();
+			glAttachShader(s_ShaderProgram, vertexShader);
+			glAttachShader(s_ShaderProgram, fragmentShader);
+
+			glLinkProgram(s_ShaderProgram);
+			glUseProgram(s_ShaderProgram);
+
+			// TESTING ONLY
+			DrawTriangle();
 		}
-
-		// Make this window the current window context
-		glfwMakeContextCurrent(s_GLWindow);
-
-		// Load GLAD
-		if (!gladLoadGL(glfwGetProcAddress))
+		else
 		{
-			VX_ERROR("Failed to load GLAD");
-			return;
+			VX_ERROR("Trying to access window but it does not exist");
 		}
-		VX_LOG("GLAD loaded");
-
-		/*
-		* IF RENDERING GETS SLOW, LOOK HERE!
-		* 
-		* Rather than creating different VAOs and buffers, we are using one for everything
-		* This is not the "correct" way to handle rendering, but I don't want to get trapped in premature optimization
-		* Once frames begin to drop, this should be the first place that is looked at for optimization
-		*/
-
-		// The window will use a single vertex array object
-		GLuint vao;
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-
-		// The window will use a single vertex buffer object
-		GLuint vbo;
-		glGenBuffers(1, &vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-		// The window will use a single element buffer object
-		GLuint ebo;
-		glGenBuffers(1, &ebo);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-
-		// The window will use a single texture
-		GLuint tex;
-		glGenTextures(1, &tex);
-		glBindTexture(GL_TEXTURE_2D, tex);
-
-		// Set texture parameters
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-		// Load the shaders
-		std::string vertexName = "Basic.vert";
-		std::string vertexSource = FileLoader::LoadShader(vertexName);
-
-		GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		const char* vertexCStr = vertexSource.c_str();
-		glShaderSource(vertexShader, 1, &vertexCStr, NULL);
-		glCompileShader(vertexShader);
-
-		GLint status;
-		glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &status);
-		if (status == GL_FALSE)
-		{
-			char buffer[512];
-			glGetShaderInfoLog(vertexShader, 512, NULL, buffer);
-			VX_ERROR("Error compiling \"" + vertexName + "\":\n" + buffer);
-		}
-
-		std::string fragmentName = "Basic.frag";
-		std::string fragmentSource = FileLoader::LoadShader(fragmentName);
-
-		GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-		const char* fragmentCStr = fragmentSource.c_str();
-		glShaderSource(fragmentShader, 1, &fragmentCStr, NULL);
-		glCompileShader(fragmentShader);
-
-		glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &status);
-		if (status == GL_FALSE)
-		{
-			char buffer[512];
-			glGetShaderInfoLog(fragmentShader, 512, NULL, buffer);
-			VX_ERROR("Error compiling \"" + fragmentName + "\":\n" + buffer);
-		}
-
-		s_ShaderProgram = glCreateProgram();
-		glAttachShader(s_ShaderProgram, vertexShader);
-		glAttachShader(s_ShaderProgram, fragmentShader);
-
-		glLinkProgram(s_ShaderProgram);
-		glUseProgram(s_ShaderProgram);
-
-		// TESTING ONLY
-		DrawTriangle();
 	}
 
 }

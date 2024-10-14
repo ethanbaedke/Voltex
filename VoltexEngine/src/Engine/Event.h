@@ -42,7 +42,7 @@ namespace VoltexEngine {
 	{
 
 		/* The signature of a function this event can hold */
-		using Signature = std::function<void(T)>;
+		using Signature = std::function<void(std::weak_ptr<T>)>;
 
 	public:
 
@@ -53,7 +53,7 @@ namespace VoltexEngine {
 		}
 
 		/* Call all stored functions on this event */
-		void Invoke(T t)
+		void Invoke(std::shared_ptr<T> t)
 		{
 			for (Signature func : m_Functions)
 			{

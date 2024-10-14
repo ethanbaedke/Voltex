@@ -2,6 +2,7 @@
 #include "vxpch.h"
 
 #include "Window.h"
+#include "GameObject.h"
 
 namespace VoltexEngine {
 
@@ -14,13 +15,23 @@ namespace VoltexEngine {
 
 	private:
 
-		std::unique_ptr<Window> m_Window;
+		std::shared_ptr<Window> m_Window;
+
+		/* All initialized game objects tracked by this application */
+		std::vector<std::weak_ptr<GameObject>> m_GameObjects;
+
+		/* Uninitialized game objects that need to be initialized next frame */
+		std::vector<std::weak_ptr<GameObject>> m_UninitializedGameObjects;
 
 	public:
 
 		Application();
 
 		void Run();
+
+	private:
+
+		void HandleGameObjectCreated(std::weak_ptr<GameObject> gameObject);
 
 	};
 
