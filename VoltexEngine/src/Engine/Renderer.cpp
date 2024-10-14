@@ -7,6 +7,10 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 namespace VoltexEngine {
 
 	// Declare/Define static variables
@@ -46,11 +50,24 @@ namespace VoltexEngine {
 		return true;
 	}
 
+	float theta = 1.0;
+
 	void Renderer::Tick(float deltaTime)
 	{
 		GLFWwindow* currentWindow = glfwGetCurrentContext();
 		if (!glfwWindowShouldClose(currentWindow))
 		{
+			glClearColor(0.13f, 0.16f, 0.27f, 1.0f); // Navy blue
+			glClear(GL_COLOR_BUFFER_BIT);
+
+			theta += .1f;
+			glm::mat4 trans = glm::mat4(1.0f);
+			trans = glm::translate(trans, glm::vec3((theta / 180) - 1.0f, 0.0f, 0.0f));
+			trans = glm::rotate(trans, glm::radians(theta), glm::vec3(0.0f, 0.0f, 1.0f));
+			trans = glm::scale(trans, glm::vec3(sin(theta / 90)));
+			GLint vertexTransformationMatrix = glGetUniformLocation(s_ShaderProgram, "transformationMatrix");
+			glUniformMatrix4fv(vertexTransformationMatrix, 1, GL_FALSE, glm::value_ptr(trans));
+
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 			glfwSwapBuffers(currentWindow);
 			glfwPollEvents();
