@@ -69,6 +69,16 @@ project "GLAD"
         "GLAD/include"
     }
 
+project "GLM"
+    location "GLM"
+    kind "StaticLib"
+    language "C"
+
+    files
+    {
+        "GLM/**.hpp"
+    }
+
 project "VoltexEngine"
     location "VoltexEngine"
     kind "StaticLib"
@@ -89,7 +99,8 @@ project "VoltexEngine"
     {
         "VoltexEngine/src",
         "GLFW/include",
-        "GLAD/include"
+        "GLAD/include",
+        "GLM"
     }
 
     links
@@ -119,7 +130,8 @@ project "VoltexGame"
     {
         "VoltexEngine/src",
         "GLFW/include",
-        "GLAD/include"
+        "GLAD/include",
+        "GLM"
     }
 
     links

@@ -61,17 +61,17 @@ namespace VoltexEngine {
 	{
 		// Load pixels as a texture
 		int texWidth, texHeight, channels;
-		unsigned char* pixels = stbi_load("../VoltexEngine/textures/MyHotGirlfriend.png", &texWidth, &texHeight, &channels, 0);
+		unsigned char* pixels = stbi_load("../VoltexEngine/textures/MyBuds.png", &texWidth, &texHeight, &channels, 0);
 		GLenum format = (channels == 3 ? GL_RGB : GL_RGBA);
 		glTexImage2D(GL_TEXTURE_2D, 0, format, texWidth, texHeight, 0, format, GL_UNSIGNED_BYTE, pixels);
 
 		// Set the vertices
 		GLfloat vertices[] = {
-		//	Position		Color				TexCoords
-			-0.5f, -0.75f,	1.0f, 0.0f, 1.0f,	0.0f, 1.0f,
-			0.5f, -0.75f,	0.0f, 1.0f, 1.0f,	1.0f, 1.0f,
-			0.5f, 0.75f,	0.0f, 1.0f, 0.0f,	1.0f, 0.0f,
-			-0.5f, 0.75f,	1.0f, 0.0f, 0.0f,	0.0f, 0.0f
+			//	Position		Color				TexCoords
+				-0.5f, -0.75f,	1.0f, 1.0f, 1.0f,	0.0f, 1.0f,
+				0.5f, -0.75f,	1.0f, 1.0f, 1.0f,	1.0f, 1.0f,
+				0.5f, 0.75f,	1.0f, 1.0f, 1.0f,	1.0f, 0.0f,
+				-0.5f, 0.75f,	1.0f, 1.0f, 1.0f,	0.0f, 0.0f
 		};
 
 		GLuint elements[] = {
