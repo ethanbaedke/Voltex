@@ -2,6 +2,8 @@
 #include "vxpch.h"
 
 #include "Window.h"
+#include "GameObject.h"
+#include "Sprite.h"
 
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
@@ -24,7 +26,7 @@ namespace VoltexEngine {
 
 		static bool Init();
 
-		static void Tick(float deltaTime);
+		static void Tick(float deltaTime, const std::vector<std::weak_ptr<GameObject>>& gameObjects);
 
 	private:
 
@@ -32,7 +34,10 @@ namespace VoltexEngine {
 		static void DrawTriangle();
 
 		/* Called when an engine window is created */
-		static void WindowCreatedCallback(std::weak_ptr<Window> window);
+		static void HandleWindowCreated(std::weak_ptr<Window> window);
+
+		/* Called when a sprite is created */
+		static void HandleSpriteCreated(std::weak_ptr<Sprite> sprite, const std::string& texturePath);
 
 	};
 

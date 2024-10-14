@@ -42,25 +42,25 @@ namespace VoltexEngine {
 					sharedObj->Initialize();
 					m_GameObjects.push_back(weakObj);
 				}
-				else
-				{
-					VX_ERROR("Trying to access object but it does not exist");
-				}
 			}
 
 			// Update game objects
-			for (std::weak_ptr<GameObject> weakObj : m_GameObjects)
+			for (int i = 0; i < m_GameObjects.size(); i++)
 			{
-				// Make sure the object still exists
-				if (std::shared_ptr<GameObject> sharedObj = weakObj.lock())
+				if (std::shared_ptr<GameObject> obj = m_GameObjects[i].lock())
 				{
-					// Update the object
-					sharedObj->Update(deltaTime);
+					// Update object
+					obj->Update(deltaTime);
+				}
+				else
+				{
+					// Remove expired object
+					m_GameObjects.erase(m_GameObjects.begin() + i);
 				}
 			}
 
-			// Render
-			Renderer::Tick(deltaTime);
+			// Render, by the time we do this any expired game objects have been removed already
+			Renderer::Tick(deltaTime, m_GameObjects);
 		}
 	}
 

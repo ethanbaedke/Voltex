@@ -6,7 +6,7 @@
 namespace VoltexEngine {
 
 	// Initialize static variables
-	Event_OneParam<Window> Window::s_OnWindowCreated;
+	Event_OneParam<std::weak_ptr<Window>> Window::s_OnWindowCreated;
 
 	std::shared_ptr<Window> Window::Create(const std::string& name, int width, int height)
 	{

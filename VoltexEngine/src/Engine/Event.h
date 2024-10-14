@@ -42,7 +42,7 @@ namespace VoltexEngine {
 	{
 
 		/* The signature of a function this event can hold */
-		using Signature = std::function<void(std::weak_ptr<T>)>;
+		using Signature = std::function<void(T)>;
 
 	public:
 
@@ -53,11 +53,43 @@ namespace VoltexEngine {
 		}
 
 		/* Call all stored functions on this event */
-		void Invoke(std::shared_ptr<T> t)
+		void Invoke(T t)
 		{
 			for (Signature func : m_Functions)
 			{
 				func(t);
+			}
+		}
+
+	private:
+
+		/* A list of all functions that should be called when this event is invoked */
+		std::vector<Signature> m_Functions;
+
+	};
+
+	/* An event whos callback functions take two parameters */
+	template <typename T1, typename T2>
+	class Event_TwoParam
+	{
+
+		/* The signature of a function this event can hold */
+		using Signature = std::function<void(T1, T2)>;
+
+	public:
+
+		/* Add a function to be called when this event is invoked */
+		void AddCallback(Signature function)
+		{
+			m_Functions.push_back(function);
+		}
+
+		/* Call all stored functions on this event */
+		void Invoke(T1 t1, T2 t2)
+		{
+			for (Signature func : m_Functions)
+			{
+				func(t1, t2);
 			}
 		}
 

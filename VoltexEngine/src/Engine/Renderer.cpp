@@ -43,7 +43,10 @@ namespace VoltexEngine {
 		glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
 		// Add a callback for a window being created
-		Window::s_OnWindowCreated.AddCallback([&](std::weak_ptr<Window> window) { WindowCreatedCallback(window); });
+		Window::s_OnWindowCreated.AddCallback([&](std::weak_ptr<Window> window) { HandleWindowCreated(window); });
+
+		// Add a callback for a sprite being created
+		Sprite::s_OnSpriteCreated.AddCallback([&](std::weak_ptr<Sprite> sprite, const std::string& texturePath) { HandleSpriteCreated(sprite, texturePath); });
 
 		s_Initialized = true;
 		VX_LOG("Renderer initialized");
@@ -52,7 +55,7 @@ namespace VoltexEngine {
 
 	float theta = 1.0;
 
-	void Renderer::Tick(float deltaTime)
+	void Renderer::Tick(float deltaTime, const std::vector<std::weak_ptr<GameObject>>& gameObjects)
 	{
 		GLFWwindow* currentWindow = glfwGetCurrentContext();
 		if (currentWindow && !glfwWindowShouldClose(currentWindow))
@@ -60,6 +63,7 @@ namespace VoltexEngine {
 			glClearColor(0.13f, 0.16f, 0.27f, 1.0f); // Navy blue
 			glClear(GL_COLOR_BUFFER_BIT);
 
+			/*
 			theta += .1f;
 			glm::mat4 trans = glm::mat4(1.0f);
 			trans = glm::translate(trans, glm::vec3((theta / 180) - 1.0f, 0.0f, 0.0f));
@@ -67,8 +71,32 @@ namespace VoltexEngine {
 			trans = glm::scale(trans, glm::vec3(sin(theta / 90)));
 			GLint vertexTransformationMatrix = glGetUniformLocation(s_ShaderProgram, "transformationMatrix");
 			glUniformMatrix4fv(vertexTransformationMatrix, 1, GL_FALSE, glm::value_ptr(trans));
+			*/
 
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			// The game objects passed into this function have already been filtered, no need to check for expiration
+			for (std::weak_ptr<GameObject> weakObj : gameObjects)
+			{
+				std::shared_ptr<GameObject> obj = weakObj.lock();
+
+				Vector position = obj->GetPosition();
+				Vector scale = obj->GetScale();
+				float radianAngle = glm::radians(obj->GetRotation());
+
+				glm::mat4 transform = glm::mat4(1.0f);
+				transform = glm::translate(transform, glm::vec3(position.X(), position.Y(), 0.0f));
+				transform = glm::rotate(transform, radianAngle, glm::vec3(0.0f, 0.0f, 1.0f));
+				transform = glm::scale(transform, glm::vec3(scale.X(), scale.Y(), 0.0f));
+				GLint vertexTransformationMatrix = glGetUniformLocation(s_ShaderProgram, "transformationMatrix");
+				glUniformMatrix4fv(vertexTransformationMatrix, 1, GL_FALSE, glm::value_ptr(transform));
+
+				if (std::shared_ptr<Sprite> spr = obj->GetSprite())
+				{
+					glBindTexture(GL_TEXTURE_2D, spr->GetTextureID());
+				}
+
+				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			}
+
 			glfwSwapBuffers(currentWindow);
 			glfwPollEvents();
 		}
@@ -76,12 +104,6 @@ namespace VoltexEngine {
 
 	void Renderer::DrawTriangle()
 	{
-		// Load pixels as a texture
-		int texWidth, texHeight, channels;
-		unsigned char* pixels = stbi_load("../VoltexEngine/textures/MyBuds.png", &texWidth, &texHeight, &channels, 0);
-		GLenum format = (channels == 3 ? GL_RGB : GL_RGBA);
-		glTexImage2D(GL_TEXTURE_2D, 0, format, texWidth, texHeight, 0, format, GL_UNSIGNED_BYTE, pixels);
-
 		// Set the vertices
 		GLfloat vertices[] = {
 			//	Position		Color				TexCoords
@@ -118,7 +140,7 @@ namespace VoltexEngine {
 		glEnableVertexAttribArray(vertexInTexCoords);
 	}
 
-	void Renderer::WindowCreatedCallback(std::weak_ptr<Window> window)
+	void Renderer::HandleWindowCreated(std::weak_ptr<Window> window)
 	{
 		if (s_GLWindow)
 		{
@@ -172,17 +194,6 @@ namespace VoltexEngine {
 			glGenBuffers(1, &ebo);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-			// The window will use a single texture
-			GLuint tex;
-			glGenTextures(1, &tex);
-			glBindTexture(GL_TEXTURE_2D, tex);
-
-			// Set texture parameters
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
 			// Load the shaders
 			std::string vertexName = "Basic.vert";
 			std::string vertexSource = FileLoader::LoadShader(vertexName);
@@ -230,6 +241,41 @@ namespace VoltexEngine {
 		else
 		{
 			VX_ERROR("Trying to access window but it does not exist");
+		}
+	}
+
+	void Renderer::HandleSpriteCreated(std::weak_ptr<Sprite> sprite, const std::string& texturePath)
+	{
+		if (std::shared_ptr<Sprite> sharedSpr = sprite.lock())
+		{
+			// Load image pixels into array
+			int texWidth, texHeight, channels;
+			unsigned char* pixels = stbi_load(texturePath.c_str(), &texWidth, &texHeight, &channels, 0);
+
+			if (pixels == stbi__errpuc("can't fopen", "Unable to open file"))
+			{
+				VX_ERROR("Could not load file: " + texturePath);
+				return;
+			}
+
+			// Generate the texture
+			GLuint texID;
+			glGenTextures(1, &texID);
+			glBindTexture(GL_TEXTURE_2D, texID);
+
+			// Set texture parameters
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+			// Load texture to graphics card
+			GLenum format = (channels == 3 ? GL_RGB : GL_RGBA);
+			glTexImage2D(GL_TEXTURE_2D, 0, format, texWidth, texHeight, 0, format, GL_UNSIGNED_BYTE, pixels);
+
+			VX_LOG("Loaded texture: " + texturePath);
+			glBindTexture(GL_TEXTURE_2D, 0);
+			sharedSpr->SetTextureID(texID);
 		}
 	}
 

@@ -11,7 +11,7 @@ namespace VoltexEngine {
 	public:
 
 		/* Broadcasts a window whenever one is created */
-		static Event_OneParam<Window> s_OnWindowCreated;
+		static Event_OneParam<std::weak_ptr<Window>> s_OnWindowCreated;
 
 	public:
 
