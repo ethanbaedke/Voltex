@@ -12,7 +12,7 @@ namespace VoltexEngine {
 		if (!Renderer::Init())
 			return;
 
-		m_Window = std::make_unique<Window>("Voltex Window", 800, 600);
+		m_Window = std::make_unique<Window>("Voltex Window", 1920, 1080);
 
 		VX_LOG("Application Initialized");
 	}
