@@ -20,7 +20,7 @@ namespace VoltexEngine {
 		Vector v2(1, 2);
 		Vector v3 = v1.Dot(v2);
 
-		VX_LOG(std::to_string(v3.X()));
+		VX_LOG(v3.GetPrintable());
 
 		VX_LOG("Application Initialized");
 	}

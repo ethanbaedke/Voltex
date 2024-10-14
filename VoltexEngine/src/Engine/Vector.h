@@ -1,9 +1,11 @@
 #pragma once
 #include "vxpch.h"
 
+#include "Printable.h"
+
 namespace VoltexEngine {
 
-	class Vector
+	class Vector : public IPrintable
 	{
 
 	public:
@@ -29,6 +31,8 @@ namespace VoltexEngine {
 
 		inline float X() const { return m_X; }
 		inline float Y() const { return m_Y; }
+
+		virtual std::string GetPrintable() const override;
 
 	private:
 

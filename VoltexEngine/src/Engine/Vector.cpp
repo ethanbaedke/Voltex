@@ -56,4 +56,9 @@ namespace VoltexEngine {
 		return Vector(m_X / divisor, m_Y / divisor);
 	}
 
+	std::string Vector::GetPrintable() const
+	{
+		return "(" + std::to_string(m_X) + ", " + std::to_string(m_Y) + ")";
+	}
+
 }
