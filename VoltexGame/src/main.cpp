@@ -70,6 +70,8 @@ public:
 		// Create some instances of our custom game object
 		std::shared_ptr<ExampleObject> barrel = ExampleObject::Create<ExampleObject>();
 		barrel->SetSprite(barrelSprite);
+		// This line makes sure the barrel will always be renderered behind the present
+		barrel->SetDepth(-1);
 		m_GameObjects.push_back(barrel);
 
 		std::shared_ptr<ExampleObject> present = ExampleObject::Create<ExampleObject>();

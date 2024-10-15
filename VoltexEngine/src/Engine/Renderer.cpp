@@ -71,7 +71,7 @@ namespace VoltexEngine {
 		if (std::shared_ptr<Window> win = s_EngineWindow.lock())
 		{
 			glClearColor(0.13f, 0.16f, 0.27f, 1.0f); // Navy blue
-			glClear(GL_COLOR_BUFFER_BIT);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			// The number of units visible on the screen horizontally
 			float zoomOut = 10.0f;
@@ -89,10 +89,11 @@ namespace VoltexEngine {
 				Vector position = obj->GetPosition();
 				Vector scale = obj->GetScale();
 				float radianAngle = glm::radians(obj->GetRotation());
+				int depth = obj->GetDepth();
 
 				// Create and bind the model matrix
 				glm::mat4 modelMatrix = glm::mat4(1.0f);
-				modelMatrix = glm::translate(modelMatrix, glm::vec3(position.X(), position.Y(), 0.0f));
+				modelMatrix = glm::translate(modelMatrix, glm::vec3(position.X(), position.Y(), depth));
 				modelMatrix = glm::rotate(modelMatrix, radianAngle, glm::vec3(0.0f, 0.0f, 1.0f));
 				modelMatrix = glm::scale(modelMatrix, glm::vec3(scale.X(), scale.Y(), 0.0f));
 				GLint vertexModelMatrix = glGetUniformLocation(s_ShaderProgram, "modelMatrix");
@@ -160,6 +161,10 @@ namespace VoltexEngine {
 				return;
 			}
 			VX_LOG("GLAD loaded");
+
+			// Enable depth ordering for rendering
+			glEnable(GL_DEPTH_TEST);
+			glDepthFunc(GL_LESS);
 
 			/*
 			* IF RENDERING GETS SLOW, LOOK HERE!

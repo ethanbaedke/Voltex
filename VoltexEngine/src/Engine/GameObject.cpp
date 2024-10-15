@@ -14,7 +14,7 @@ namespace VoltexEngine {
 	}
 
 	GameObject::GameObject()
-		: m_Position(Vector()), m_Scale(Vector(1.0f)), m_Angle(0.0f)
+		: m_Position(Vector()), m_Scale(Vector(1.0f)), m_Angle(0.0f), m_Depth(0)
 	{
 	}
 
