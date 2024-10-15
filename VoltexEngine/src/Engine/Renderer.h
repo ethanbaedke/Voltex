@@ -26,7 +26,7 @@ namespace VoltexEngine {
 
 		static bool Init();
 
-		static void Tick(float deltaTime, const std::vector<std::weak_ptr<GameObject>>& gameObjects);
+		static void Tick(const std::vector<std::weak_ptr<GameObject>>& gameObjects);
 
 	private:
 

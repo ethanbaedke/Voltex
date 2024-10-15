@@ -123,7 +123,8 @@ project "VoltexGame"
     files
     {
         "VoltexGame/src/**.h",
-        "VoltexGame/src/**.cpp"
+        "VoltexGame/src/**.cpp",
+        "VoltexGame/textures/*.png"
     }
 
     includedirs

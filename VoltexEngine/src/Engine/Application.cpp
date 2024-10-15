@@ -5,6 +5,8 @@
 #include "Console.h"
 #include "Vector.h"
 
+#include <chrono>
+
 namespace VoltexEngine {
 
 	Application::Application()
@@ -23,7 +25,7 @@ namespace VoltexEngine {
 
 	void Application::Run()
 	{
-		float deltaTime = 1.0f / 60.0f;
+		auto prevFrameTime = std::chrono::high_resolution_clock::now();
 
 		while (true)
 		{
@@ -45,12 +47,14 @@ namespace VoltexEngine {
 			}
 
 			// Update game objects
+			auto currentFrameTime = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<float> deltaTime = currentFrameTime - prevFrameTime;
 			for (int i = 0; i < m_GameObjects.size(); i++)
 			{
 				if (std::shared_ptr<GameObject> obj = m_GameObjects[i].lock())
 				{
 					// Update object
-					obj->Update(deltaTime);
+					obj->Update(deltaTime.count());
 				}
 				else
 				{
@@ -58,9 +62,10 @@ namespace VoltexEngine {
 					m_GameObjects.erase(m_GameObjects.begin() + i);
 				}
 			}
+			prevFrameTime = currentFrameTime;
 
 			// Render, by the time we do this any expired game objects have been removed already
-			Renderer::Tick(deltaTime, m_GameObjects);
+			Renderer::Tick(m_GameObjects);
 		}
 	}
 

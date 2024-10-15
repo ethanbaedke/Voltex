@@ -53,7 +53,7 @@ namespace VoltexEngine {
 		return true;
 	}
 
-	void Renderer::Tick(float deltaTime, const std::vector<std::weak_ptr<GameObject>>& gameObjects)
+	void Renderer::Tick(const std::vector<std::weak_ptr<GameObject>>& gameObjects)
 	{
 		GLFWwindow* currentWindow = glfwGetCurrentContext();
 
