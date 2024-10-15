@@ -30,9 +30,6 @@ namespace VoltexEngine {
 
 	private:
 
-		/* TESTING ONLY: Draws a triangle to the screen */
-		static void DrawTriangle();
-
 		/* Called when an engine window is created */
 		static void HandleWindowCreated(std::weak_ptr<Window> window);
 

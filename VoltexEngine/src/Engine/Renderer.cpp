@@ -53,41 +53,64 @@ namespace VoltexEngine {
 		return true;
 	}
 
-	float theta = 1.0;
-
 	void Renderer::Tick(float deltaTime, const std::vector<std::weak_ptr<GameObject>>& gameObjects)
 	{
 		GLFWwindow* currentWindow = glfwGetCurrentContext();
-		if (currentWindow && !glfwWindowShouldClose(currentWindow))
+
+		if (!currentWindow)
+		{
+			VX_ERROR("GLFW window does not exist");
+			return;
+		}
+		else if (glfwWindowShouldClose(currentWindow))
+		{
+			VX_ERROR("GLFW window should close");
+			return;
+		}
+
+		if (std::shared_ptr<Window> win = s_EngineWindow.lock())
 		{
 			glClearColor(0.13f, 0.16f, 0.27f, 1.0f); // Navy blue
 			glClear(GL_COLOR_BUFFER_BIT);
 
-			/*
-			theta += .1f;
-			glm::mat4 trans = glm::mat4(1.0f);
-			trans = glm::translate(trans, glm::vec3((theta / 180) - 1.0f, 0.0f, 0.0f));
-			trans = glm::rotate(trans, glm::radians(theta), glm::vec3(0.0f, 0.0f, 1.0f));
-			trans = glm::scale(trans, glm::vec3(sin(theta / 90)));
-			GLint vertexTransformationMatrix = glGetUniformLocation(s_ShaderProgram, "transformationMatrix");
-			glUniformMatrix4fv(vertexTransformationMatrix, 1, GL_FALSE, glm::value_ptr(trans));
-			*/
+			// The number of units visible on the screen horizontally
+			float zoomOut = 10.0f;
+
+			// Calculated from the center of the screen to the bounds
+			float unitsX = zoomOut / 2.0f;
+			float unitsY = ((float)win->GetHeight() / (float)win->GetWidth()) * unitsX;
 
 			// The game objects passed into this function have already been filtered, no need to check for expiration
 			for (std::weak_ptr<GameObject> weakObj : gameObjects)
 			{
 				std::shared_ptr<GameObject> obj = weakObj.lock();
-
+				
+				// Get the position, scale, and rotation of the game object
 				Vector position = obj->GetPosition();
 				Vector scale = obj->GetScale();
 				float radianAngle = glm::radians(obj->GetRotation());
 
-				glm::mat4 transform = glm::mat4(1.0f);
-				transform = glm::translate(transform, glm::vec3(position.X(), position.Y(), 0.0f));
-				transform = glm::rotate(transform, radianAngle, glm::vec3(0.0f, 0.0f, 1.0f));
-				transform = glm::scale(transform, glm::vec3(scale.X(), scale.Y(), 0.0f));
-				GLint vertexTransformationMatrix = glGetUniformLocation(s_ShaderProgram, "transformationMatrix");
-				glUniformMatrix4fv(vertexTransformationMatrix, 1, GL_FALSE, glm::value_ptr(transform));
+				// Create and bind the model matrix
+				glm::mat4 modelMatrix = glm::mat4(1.0f);
+				modelMatrix = glm::translate(modelMatrix, glm::vec3(position.X(), position.Y(), 0.0f));
+				modelMatrix = glm::rotate(modelMatrix, radianAngle, glm::vec3(0.0f, 0.0f, 1.0f));
+				modelMatrix = glm::scale(modelMatrix, glm::vec3(scale.X(), scale.Y(), 0.0f));
+				GLint vertexModelMatrix = glGetUniformLocation(s_ShaderProgram, "modelMatrix");
+				glUniformMatrix4fv(vertexModelMatrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+
+				// Create and bind the view matrix
+				glm::mat4 viewMatrix = glm::lookAt(
+					glm::vec3(0.0f, 0.0f, 5.0f),
+					glm::vec3(0.0f, 0.0f, 0.0f),
+					glm::vec3(0.0f, 1.0f, 0.0f)
+				);
+				GLint vertexViewMatrix = glGetUniformLocation(s_ShaderProgram, "viewMatrix");
+				glUniformMatrix4fv(vertexViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+
+				// Create and bind the projection matrix
+				glm::mat4 projectionMatrix = glm::ortho(-unitsX, unitsX, -unitsY, unitsY, 1.0f, 10.0f);
+				GLint vertexProjectionMatrix = glGetUniformLocation(s_ShaderProgram, "projectionMatrix");
+				glUniformMatrix4fv(vertexProjectionMatrix, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 
 				if (std::shared_ptr<Sprite> spr = obj->GetSprite())
 				{
@@ -100,44 +123,11 @@ namespace VoltexEngine {
 			glfwSwapBuffers(currentWindow);
 			glfwPollEvents();
 		}
-	}
-
-	void Renderer::DrawTriangle()
-	{
-		// Set the vertices
-		GLfloat vertices[] = {
-			//	Position		Color				TexCoords
-				-0.5f, -0.75f,	1.0f, 1.0f, 1.0f,	0.0f, 1.0f,
-				0.5f, -0.75f,	1.0f, 1.0f, 1.0f,	1.0f, 1.0f,
-				0.5f, 0.75f,	1.0f, 1.0f, 1.0f,	1.0f, 0.0f,
-				-0.5f, 0.75f,	1.0f, 1.0f, 1.0f,	0.0f, 0.0f
-		};
-
-		GLuint elements[] = {
-			0, 1, 2,
-			2, 3, 0
-		};
-
-		// Load verts into the vertex buffer
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-		// Load elements into the element buffer
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
-
-		// Set the position on the vertex
-		GLint vertexInPosition = glGetAttribLocation(s_ShaderProgram, "inPosition");
-		glVertexAttribPointer(vertexInPosition, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), 0);
-		glEnableVertexAttribArray(vertexInPosition);
-
-		// Set the color on the vertex
-		GLint vertexInColor = glGetAttribLocation(s_ShaderProgram, "inColor");
-		glVertexAttribPointer(vertexInColor, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(2 * sizeof(float)));
-		glEnableVertexAttribArray(vertexInColor);
-
-		// Set the texture coordinates on the vertex
-		GLint vertexInTexCoords = glGetAttribLocation(s_ShaderProgram, "inTexCoords");
-		glVertexAttribPointer(vertexInTexCoords, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(5 * sizeof(float)));
-		glEnableVertexAttribArray(vertexInTexCoords);
+		else
+		{
+			VX_ERROR("Attempting to access engine window but it's been destroyed");
+			return;
+		}
 	}
 
 	void Renderer::HandleWindowCreated(std::weak_ptr<Window> window)
@@ -235,8 +225,40 @@ namespace VoltexEngine {
 			glLinkProgram(s_ShaderProgram);
 			glUseProgram(s_ShaderProgram);
 
-			// TESTING ONLY
-			DrawTriangle();
+			// Set the vertices
+			GLfloat vertices[] = {
+				//	Position		Color				TexCoords
+					-0.5f, -0.5f,	1.0f, 1.0f, 1.0f,	0.0f, 1.0f,
+					0.5f, -0.5f,	1.0f, 1.0f, 1.0f,	1.0f, 1.0f,
+					0.5f, 0.5f,		1.0f, 1.0f, 1.0f,	1.0f, 0.0f,
+					-0.5f, 0.5f,	1.0f, 1.0f, 1.0f,	0.0f, 0.0f
+			};
+
+			GLuint elements[] = {
+				0, 1, 2,
+				2, 3, 0
+			};
+
+			// Load verts into the vertex buffer
+			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+			// Load elements into the element buffer
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
+
+			// Set the position on the vertex
+			GLint vertexInPosition = glGetAttribLocation(s_ShaderProgram, "inPosition");
+			glVertexAttribPointer(vertexInPosition, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), 0);
+			glEnableVertexAttribArray(vertexInPosition);
+
+			// Set the color on the vertex
+			GLint vertexInColor = glGetAttribLocation(s_ShaderProgram, "inColor");
+			glVertexAttribPointer(vertexInColor, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(2 * sizeof(float)));
+			glEnableVertexAttribArray(vertexInColor);
+
+			// Set the texture coordinates on the vertex
+			GLint vertexInTexCoords = glGetAttribLocation(s_ShaderProgram, "inTexCoords");
+			glVertexAttribPointer(vertexInTexCoords, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(5 * sizeof(float)));
+			glEnableVertexAttribArray(vertexInTexCoords);
 		}
 		else
 		{
