@@ -26,10 +26,13 @@ namespace VoltexEngine {
 
 		static bool Init(int windowWidth, int windowHeight);
 
+		/* Update all images on the screen */
 		static void Tick(const std::vector<std::shared_ptr<GameObject>>& gameObjects);
 
 		/* Reads the image at texture path, generates a texture, and returns its textureID */
 		static unsigned int GenerateTexture(const std::string& texturePath, int* outWidth, int* outHeight);
+
+		static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 	};
 

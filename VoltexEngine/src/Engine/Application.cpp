@@ -4,6 +4,7 @@
 #include "Renderer.h"
 #include "Console.h"
 #include "Vector.h"
+#include "Input.h"
 
 #include <chrono>
 
@@ -12,6 +13,9 @@ namespace VoltexEngine {
 	Application::Application()
 		: m_GameObjects(std::vector<std::shared_ptr<GameObject>>()), m_UninitializedGameObjects(std::vector<std::shared_ptr<GameObject>>())
 	{
+		if (!Input::Init())
+			return;
+
 		if (!Renderer::Init(1280, 720))
 			return;
 
@@ -24,6 +28,9 @@ namespace VoltexEngine {
 
 		while (true)
 		{
+			// Process input for this frame (input queued last frame is now available for use)
+			Input::Tick();
+
 			// Initialize any uninitialized game objects
 			// We use a while loop so if objects are created in other objects init functions they are also initialized
 			while (m_UninitializedGameObjects.size() > 0)

@@ -4,6 +4,7 @@
 #include "Console.h"
 #include "FileLoader.h"
 #include "Sprite.h"
+#include "Input.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -171,6 +172,9 @@ namespace VoltexEngine {
 		glVertexAttribPointer(vertexInTexCoords, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(5 * sizeof(float)));
 		glEnableVertexAttribArray(vertexInTexCoords);
 
+		// Bind input callbacks
+		glfwSetKeyCallback(s_Window, KeyCallback);
+
 		VX_LOG("Renderer initialized");
 		return true;
 	}
@@ -280,6 +284,23 @@ namespace VoltexEngine {
 		VX_LOG("Loaded texture: " + texturePath);
 		glBindTexture(GL_TEXTURE_2D, 0);
 		return texID;
+	}
+
+	void Renderer::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+	{
+		// Uncomment to see keycodes
+		VX_LOG(std::to_string(key));
+
+		// Key released
+		if (action == 0)
+		{
+			Input::EnqueueInput(key, Input::InputType::KeyUp);
+		}
+		// Key pressed
+		else if (action == 1)
+		{
+			Input::EnqueueInput(key, Input::InputType::KeyDown);
+		}
 	}
 
 }
