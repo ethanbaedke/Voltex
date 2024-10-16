@@ -1,7 +1,6 @@
 #pragma once
 #include "vxpch.h"
 
-#include "Window.h"
 #include "GameObject.h"
 
 namespace VoltexEngine {
@@ -15,13 +14,11 @@ namespace VoltexEngine {
 
 	private:
 
-		std::shared_ptr<Window> m_Window;
-
 		/* All initialized game objects tracked by this application */
-		std::vector<std::weak_ptr<GameObject>> m_GameObjects;
+		std::vector<std::shared_ptr<GameObject>> m_GameObjects;
 
 		/* Uninitialized game objects that need to be initialized next frame */
-		std::vector<std::weak_ptr<GameObject>> m_UninitializedGameObjects;
+		std::vector<std::shared_ptr<GameObject>> m_UninitializedGameObjects;
 
 	public:
 
@@ -29,9 +26,18 @@ namespace VoltexEngine {
 
 		void Run();
 
-	private:
+		/* Creates an returns a GameObject or any subclass of a GameObject */
+		template <typename T>
+		std::shared_ptr<T> CreateObject()
+		{
+			std::shared_ptr<T> obj = std::make_shared<T>();
+			m_UninitializedGameObjects.push_back(obj);
+			return obj;
+		}
 
-		void HandleGameObjectCreated(std::weak_ptr<GameObject> gameObject);
+		/* Creates and returns a Sprite
+		   If there are any errors reading the texture, returns nullptr */
+		std::shared_ptr<Sprite> CreateSprite(const std::string& texturePath);
 
 	};
 

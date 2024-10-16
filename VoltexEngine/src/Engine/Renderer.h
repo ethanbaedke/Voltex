@@ -1,7 +1,6 @@
 #pragma once
 #include "vxpch.h"
 
-#include "Window.h"
 #include "GameObject.h"
 #include "Sprite.h"
 
@@ -15,26 +14,20 @@ namespace VoltexEngine {
 
 	private:
 
-		static bool s_Initialized;
-
-		static std::weak_ptr<Window> s_EngineWindow;
-		static GLFWwindow* s_GLWindow;
+		static GLFWwindow* s_Window;
+		static int s_WindowWidth;
+		static int s_WindowHeight;
 
 		static GLuint s_ShaderProgram;
 
 	public:
 
-		static bool Init();
+		static bool Init(int windowWidth, int windowHeight);
 
-		static void Tick(const std::vector<std::weak_ptr<GameObject>>& gameObjects);
+		static void Tick(const std::vector<std::shared_ptr<GameObject>>& gameObjects);
 
-	private:
-
-		/* Called when an engine window is created */
-		static void HandleWindowCreated(std::weak_ptr<Window> window);
-
-		/* Called when a sprite is created */
-		static void HandleSpriteCreated(std::weak_ptr<Sprite> sprite, const std::string& texturePath);
+		/* Reads the image at texture path, generates a texture, and returns its textureID */
+		static unsigned int GenerateTexture(const std::string& texturePath);
 
 	};
 

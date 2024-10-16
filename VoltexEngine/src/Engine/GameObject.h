@@ -13,19 +13,7 @@ namespace VoltexEngine {
 
 	public:
 
-		/* Broadcasts a game object whenever one is created */
-		static Event_OneParam<std::weak_ptr<GameObject>> s_OnGameObjectCreated;
-
-	public:
-
-		/* Creates and returns a game object */
-		template <typename T>
-		static std::shared_ptr<T> Create()
-		{
-			std::shared_ptr<T> obj(new T());
-			s_OnGameObjectCreated.Invoke(obj);
-			return obj;
-		}
+		GameObject();
 
 	private:
 
@@ -67,11 +55,6 @@ namespace VoltexEngine {
 		inline std::shared_ptr<Sprite> GetSprite() { return m_Sprite; }
 
 		virtual std::string GetPrintable() const;
-
-	protected:
-
-		/* Protected constructor forces the use of the create function */
-		GameObject();
 
 	};
 

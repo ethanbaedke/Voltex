@@ -8,11 +8,6 @@ namespace VoltexEngine {
 	class Sprite
 	{
 
-	public:
-
-		/* Broadcasts a sprite whenever one is created with the path to its texture */
-		static Event_TwoParam<std::weak_ptr<Sprite>, const std::string&> s_OnSpriteCreated;
-
 	private:
 
 		/* This is used exclusively by the renderer */
@@ -20,16 +15,10 @@ namespace VoltexEngine {
 
 	public:
 
-		/* Creates and returns a new sprite */
-		static std::shared_ptr<Sprite> Create(const std::string& texturePath);
+		Sprite(unsigned int textureID);
 
 		/* These should only be called by the renderer */
-		inline void SetTextureID(unsigned int textureID) { m_TextureID = textureID; }
 		inline unsigned int GetTextureID() const { return m_TextureID; }
-
-	private:
-
-		Sprite(const std::string& texturePath);
 
 	};
 

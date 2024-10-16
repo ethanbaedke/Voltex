@@ -10,15 +10,10 @@
 namespace VoltexEngine {
 
 	Application::Application()
-		: m_Window(nullptr), m_GameObjects(std::vector<std::weak_ptr<GameObject>>()), m_UninitializedGameObjects(std::vector<std::weak_ptr<GameObject>>())
+		: m_GameObjects(std::vector<std::shared_ptr<GameObject>>()), m_UninitializedGameObjects(std::vector<std::shared_ptr<GameObject>>())
 	{
-		if (!Renderer::Init())
+		if (!Renderer::Init(1280, 720))
 			return;
-
-		// Subscribe to game objects being created
-		GameObject::s_OnGameObjectCreated.AddCallback([&](std::weak_ptr<GameObject> gameObject) { HandleGameObjectCreated(gameObject); });
-
-		m_Window = Window::Create(std::string("Voltex Window"), 1280, 720);
 
 		VX_LOG("Application Initialized");
 	}
@@ -34,33 +29,21 @@ namespace VoltexEngine {
 			while (m_UninitializedGameObjects.size() > 0)
 			{
 				// Get and remove the back object before initializing it so if it adds more objects to the back of the list they are not removed instead
-				std::weak_ptr<GameObject> weakObj = m_UninitializedGameObjects.back();
+				std::shared_ptr<GameObject> obj = m_UninitializedGameObjects.back();
 				m_UninitializedGameObjects.pop_back();
-
-				// Make sure the object still exists
-				if (std::shared_ptr<GameObject> sharedObj = weakObj.lock())
-				{
-					// Initialize the object and add it to the game objects list
-					sharedObj->Initialize();
-					m_GameObjects.push_back(weakObj);
-				}
+				
+				// Initialize the object and add it to the list of initialized game objects
+				obj->Initialize();
+				m_GameObjects.push_back(obj);
 			}
 
 			// Update game objects
 			auto currentFrameTime = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<float> deltaTime = currentFrameTime - prevFrameTime;
-			for (int i = 0; i < m_GameObjects.size(); i++)
+			for (std::shared_ptr<GameObject> obj : m_GameObjects)
 			{
-				if (std::shared_ptr<GameObject> obj = m_GameObjects[i].lock())
-				{
-					// Update object
-					obj->Update(deltaTime.count());
-				}
-				else
-				{
-					// Remove expired object
-					m_GameObjects.erase(m_GameObjects.begin() + i);
-				}
+				// Update game object
+				obj->Update(deltaTime.count());
 			}
 			prevFrameTime = currentFrameTime;
 
@@ -69,9 +52,15 @@ namespace VoltexEngine {
 		}
 	}
 
-	void Application::HandleGameObjectCreated(std::weak_ptr<GameObject> gameObject)
+	std::shared_ptr<Sprite> Application::CreateSprite(const std::string& texturePath)
 	{
-		m_UninitializedGameObjects.push_back(gameObject);
+		unsigned int textureID = Renderer::GenerateTexture(texturePath);
+
+		if (textureID == 0)
+			return std::shared_ptr<Sprite>(nullptr);
+
+		std::shared_ptr<Sprite> spr = std::make_shared<Sprite>(textureID);
+		return spr;
 	}
 
 }

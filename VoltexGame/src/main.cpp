@@ -1,16 +1,16 @@
 #include <VoltexEngine.h>
 #include <random>
 
-namespace VE = VoltexEngine;
+using namespace VoltexEngine;
 
 /* This is an example of subclassing a GameObject */
-class ExampleObject : public VE::GameObject
+class ExampleObject : public GameObject
 {
 
 private:
 
 	// These are some variables we will use in our example object below
-	VE::Vector m_InitialPosition;
+	Vector m_InitialPosition;
 	float m_TimeElapsed = 0.0f;
 	float m_BounceSpeed = 2.0f;
 
@@ -27,7 +27,7 @@ public:
 		float randomY = dis(gen);
 		
 		// Here we create a vector holding the random x and y values we generated
-		VE::Vector randomPosition(randomX, randomY);
+		Vector randomPosition(randomX, randomY);
 
 		// We call the SetPosition function on our game object, passing in the vector we just made
 		SetPosition(randomPosition);
@@ -41,42 +41,30 @@ public:
 	{
 		// Lets have our object bounce back and fourth on the x-axis
 		m_TimeElapsed += deltaTime;
-		VE::Vector newPosition(m_InitialPosition.X() + sin(m_TimeElapsed * m_BounceSpeed), m_InitialPosition.Y());
+		Vector newPosition(m_InitialPosition.X() + sin(m_TimeElapsed * m_BounceSpeed), m_InitialPosition.Y());
 		SetPosition(newPosition);
 	}
 
 };
 
 /* This is and example of a game application */
-class Game : public VE::Application
+class Game : public Application
 {
-
-private:
-
-	std::vector<std::shared_ptr<VE::Sprite>> m_Sprites;
-	std::vector<std::shared_ptr<VE::GameObject>> m_GameObjects;
 
 public:
 
 	Game()
 	{
 		// Create some sprites
-		std::shared_ptr<VE::Sprite> barrelSprite = VE::Sprite::Create("textures/Barrel.png");
-		m_Sprites.push_back(barrelSprite);
-
-		std::shared_ptr<VE::Sprite> presentSprite = VE::Sprite::Create("textures/Present.png");
-		m_Sprites.push_back(presentSprite);
+		std::shared_ptr<Sprite> barrelSprite = CreateSprite("textures/Barrel.png");
+		std::shared_ptr<Sprite> presentSprite = CreateSprite("textures/Present.png");
 
 		// Create some instances of our custom game object
-		std::shared_ptr<ExampleObject> barrel = ExampleObject::Create<ExampleObject>();
+		std::shared_ptr<ExampleObject> barrel = CreateObject<ExampleObject>();
 		barrel->SetSprite(barrelSprite);
-		// This line makes sure the barrel will always be renderered behind the present
-		barrel->SetDepth(-1);
-		m_GameObjects.push_back(barrel);
 
-		std::shared_ptr<ExampleObject> present = ExampleObject::Create<ExampleObject>();
+		std::shared_ptr<ExampleObject> present = CreateObject<ExampleObject>();
 		present->SetSprite(presentSprite);
-		m_GameObjects.push_back(present);
 	}
 
 };
