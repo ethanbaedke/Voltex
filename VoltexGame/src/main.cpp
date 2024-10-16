@@ -23,8 +23,8 @@ public:
 		std::random_device rd;
 		std::mt19937 gen(rd());
 		std::uniform_real_distribution<> dis(-2.0, 2.0);
-		float randomX = dis(gen);
-		float randomY = dis(gen);
+		float randomX = (float)dis(gen);
+		float randomY = (float)dis(gen);
 		
 		// Here we create a vector holding the random x and y values we generated
 		Vector randomPosition(randomX, randomY);
@@ -58,6 +58,7 @@ public:
 		// Create some sprites
 		std::shared_ptr<Sprite> barrelSprite = CreateSprite("textures/Barrel.png");
 		std::shared_ptr<Sprite> presentSprite = CreateSprite("textures/Present.png");
+		std::shared_ptr<Sprite> crateSprite = CreateSprite("textures/Crate.png");
 
 		// Create some instances of our custom game object
 		std::shared_ptr<ExampleObject> barrel = CreateObject<ExampleObject>();
@@ -65,6 +66,14 @@ public:
 
 		std::shared_ptr<ExampleObject> present = CreateObject<ExampleObject>();
 		present->SetSprite(presentSprite);
+
+		std::shared_ptr<ExampleObject> crate = CreateObject<ExampleObject>();
+		crate->SetSprite(crateSprite);
+
+		// Here we tell our present to render in front, our barrel behind it, and our crate behind that
+		present->SetDepth(1);
+		barrel->SetDepth(0);
+		crate->SetDepth(-1);
 	}
 
 };

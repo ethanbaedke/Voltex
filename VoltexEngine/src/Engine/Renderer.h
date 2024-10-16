@@ -14,6 +14,8 @@ namespace VoltexEngine {
 
 	private:
 
+		static const int PPU = 16;
+
 		static GLFWwindow* s_Window;
 		static int s_WindowWidth;
 		static int s_WindowHeight;
@@ -27,7 +29,7 @@ namespace VoltexEngine {
 		static void Tick(const std::vector<std::shared_ptr<GameObject>>& gameObjects);
 
 		/* Reads the image at texture path, generates a texture, and returns its textureID */
-		static unsigned int GenerateTexture(const std::string& texturePath);
+		static unsigned int GenerateTexture(const std::string& texturePath, int* outWidth, int* outHeight);
 
 	};
 

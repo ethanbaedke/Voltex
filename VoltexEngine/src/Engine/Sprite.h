@@ -13,12 +13,19 @@ namespace VoltexEngine {
 		/* This is used exclusively by the renderer */
 		unsigned int m_TextureID;
 
+		/* The pixel width and height of the texture this sprite is holding */
+		int m_Width;
+		int m_Height;
+
 	public:
 
-		Sprite(unsigned int textureID);
+		Sprite(int width, int height, unsigned int textureID);
 
 		/* These should only be called by the renderer */
 		inline unsigned int GetTextureID() const { return m_TextureID; }
+
+		inline int GetWidth() const { return m_Width; }
+		inline int GetHeight() const { return m_Height; }
 
 	};
 

@@ -54,12 +54,13 @@ namespace VoltexEngine {
 
 	std::shared_ptr<Sprite> Application::CreateSprite(const std::string& texturePath)
 	{
-		unsigned int textureID = Renderer::GenerateTexture(texturePath);
+		int width, height;
+		unsigned int textureID = Renderer::GenerateTexture(texturePath, &width, &height);
 
 		if (textureID == 0)
 			return std::shared_ptr<Sprite>(nullptr);
 
-		std::shared_ptr<Sprite> spr = std::make_shared<Sprite>(textureID);
+		std::shared_ptr<Sprite> spr = std::make_shared<Sprite>(width, height, textureID);
 		return spr;
 	}
 

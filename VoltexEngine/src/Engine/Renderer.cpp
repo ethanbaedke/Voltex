@@ -201,55 +201,53 @@ namespace VoltexEngine {
 		float unitsY = ((float)s_WindowHeight / (float)s_WindowWidth) * unitsX;
 
 		// The game objects passed into this function have already been filtered, no need to check for expiration
-		for (std::weak_ptr<GameObject> weakObj : gameObjects)
+		for (std::shared_ptr<GameObject> obj : gameObjects)
 		{
-			std::shared_ptr<GameObject> obj = weakObj.lock();
-				
-			// Get the position, scale, and rotation of the game object
-			Vector position = obj->GetPosition();
-			Vector scale = obj->GetScale();
-			float radianAngle = glm::radians(obj->GetRotation());
-			int depth = obj->GetDepth();
-
-			// Create and bind the model matrix
-			glm::mat4 modelMatrix = glm::mat4(1.0f);
-			modelMatrix = glm::translate(modelMatrix, glm::vec3(position.X(), position.Y(), depth));
-			modelMatrix = glm::rotate(modelMatrix, radianAngle, glm::vec3(0.0f, 0.0f, 1.0f));
-			modelMatrix = glm::scale(modelMatrix, glm::vec3(scale.X(), scale.Y(), 0.0f));
-			GLint vertexModelMatrix = glGetUniformLocation(s_ShaderProgram, "modelMatrix");
-			glUniformMatrix4fv(vertexModelMatrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));
-
-			// Create and bind the view matrix
-			glm::mat4 viewMatrix = glm::lookAt(
-				glm::vec3(0.0f, 0.0f, 5.0f),
-				glm::vec3(0.0f, 0.0f, 0.0f),
-				glm::vec3(0.0f, 1.0f, 0.0f)
-			);
-			GLint vertexViewMatrix = glGetUniformLocation(s_ShaderProgram, "viewMatrix");
-			glUniformMatrix4fv(vertexViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-
-			// Create and bind the projection matrix
-			glm::mat4 projectionMatrix = glm::ortho(-unitsX, unitsX, -unitsY, unitsY, 1.0f, 10.0f);
-			GLint vertexProjectionMatrix = glGetUniformLocation(s_ShaderProgram, "projectionMatrix");
-			glUniformMatrix4fv(vertexProjectionMatrix, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-
 			if (std::shared_ptr<Sprite> spr = obj->GetSprite())
 			{
+				// Bind the texture for this sprite
 				glBindTexture(GL_TEXTURE_2D, spr->GetTextureID());
+
+				// Get the position, scale, and rotation of the game object
+				Vector position = obj->GetPosition();
+				float radianAngle = glm::radians(obj->GetRotation());
+				int depth = obj->GetDepth();
+
+				// Create and bind the model matrix
+				glm::mat4 modelMatrix = glm::mat4(1.0f);
+				modelMatrix = glm::translate(modelMatrix, glm::vec3(position.X(), position.Y(), depth));
+				modelMatrix = glm::rotate(modelMatrix, radianAngle, glm::vec3(0.0f, 0.0f, 1.0f));
+				modelMatrix = glm::scale(modelMatrix, glm::vec3((float)spr->GetWidth() / PPU, (float)spr->GetHeight() / PPU, 0.0f));
+				GLint vertexModelMatrix = glGetUniformLocation(s_ShaderProgram, "modelMatrix");
+				glUniformMatrix4fv(vertexModelMatrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+
+				// Create and bind the view matrix
+				glm::mat4 viewMatrix = glm::lookAt(
+					glm::vec3(0.0f, 0.0f, 5.0f),
+					glm::vec3(0.0f, 0.0f, 0.0f),
+					glm::vec3(0.0f, 1.0f, 0.0f)
+				);
+				GLint vertexViewMatrix = glGetUniformLocation(s_ShaderProgram, "viewMatrix");
+				glUniformMatrix4fv(vertexViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+
+				// Create and bind the projection matrix
+				glm::mat4 projectionMatrix = glm::ortho(-unitsX, unitsX, -unitsY, unitsY, 1.0f, 10.0f);
+				GLint vertexProjectionMatrix = glGetUniformLocation(s_ShaderProgram, "projectionMatrix");
+				glUniformMatrix4fv(vertexProjectionMatrix, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+
+				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 			}
 			else
 			{
 				glBindTexture(GL_TEXTURE_2D, 0);
 			}
-
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}
 
 		glfwSwapBuffers(currentWindow);
 		glfwPollEvents();
 	}
 
-	unsigned int Renderer::GenerateTexture(const std::string& texturePath)
+	unsigned int Renderer::GenerateTexture(const std::string& texturePath, int* outWidth, int* outHeight)
 	{
 		// Load image pixels into array
 		int texWidth, texHeight, channels;
@@ -275,6 +273,9 @@ namespace VoltexEngine {
 		// Load texture to graphics card
 		GLenum format = (channels == 3 ? GL_RGB : GL_RGBA);
 		glTexImage2D(GL_TEXTURE_2D, 0, format, texWidth, texHeight, 0, format, GL_UNSIGNED_BYTE, pixels);
+
+		*outWidth = texWidth;
+		*outHeight = texHeight;
 
 		VX_LOG("Loaded texture: " + texturePath);
 		glBindTexture(GL_TEXTURE_2D, 0);

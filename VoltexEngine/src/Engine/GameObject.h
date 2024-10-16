@@ -20,9 +20,6 @@ namespace VoltexEngine {
 		/* This objects position in the world */
 		Vector m_Position;
 
-		/* The objects scale in the world */
-		Vector m_Scale;
-
 		/* The angle of rotation of the object in the world, in degrees */
 		float m_Angle;
 
@@ -41,9 +38,6 @@ namespace VoltexEngine {
 
 		inline void SetPosition(const Vector& position) { m_Position = position; }
 		inline const Vector& GetPosition() { return m_Position; }
-
-		inline void SetScale(const Vector& scale) { m_Scale = scale; }
-		inline const Vector& GetScale() { return m_Scale; }
 
 		inline void SetRotation(float angle) { m_Angle = angle; }
 		inline float GetRotation() { return m_Angle; }

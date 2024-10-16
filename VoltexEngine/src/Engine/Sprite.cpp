@@ -3,8 +3,8 @@
 
 namespace VoltexEngine {
 
-	Sprite::Sprite(unsigned int textureID)
-		: m_TextureID(textureID)
+	Sprite::Sprite(int width, int height, unsigned int textureID)
+		: m_TextureID(textureID), m_Width(width), m_Height(height)
 	{
 	}
 

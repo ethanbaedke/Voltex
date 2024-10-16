@@ -22,7 +22,7 @@ namespace VoltexEngine {
 	
 	float Vector::Length() const
 	{
-		return sqrt((m_X * m_X) + (m_Y * m_Y));
+		return (float)sqrt((m_X * m_X) + (m_Y * m_Y));
 	}
 
 	float Vector::Dot(const Vector& other) const
