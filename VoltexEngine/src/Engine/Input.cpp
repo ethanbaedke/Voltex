@@ -5,13 +5,13 @@
 
 namespace VoltexEngine {
 
-	std::vector<Input::InputType> Input::m_Inputs[];
+	std::vector<Input::InputType> Input::m_KeyInputs[];
 
 	bool Input::Init()
 	{
-		for (int i = 0; i < NUM_INPUT_CODES; i++)
+		for (int i = 0; i < NUM_KEY_CODES; i++)
 		{
-			m_Inputs[i].push_back(InputType::None);
+			m_KeyInputs[i].push_back(InputType::None);
 		}
 
 		VX_LOG("Input Initialized");
@@ -20,27 +20,16 @@ namespace VoltexEngine {
 
 	void Input::Tick()
 	{
-		for (int i = 0; i < NUM_INPUT_CODES; i++)
+		for (int i = 0; i < NUM_KEY_CODES; i++)
 		{
 			// If the current code has inputs queued up, move them up one
-			if (m_Inputs[i].size() > 1)
-				m_Inputs[i].erase(m_Inputs[i].begin());
+			if (m_KeyInputs[i].size() > 1)
+				m_KeyInputs[i].erase(m_KeyInputs[i].begin());
 
 			// The current code has no inputs queued up, set its InputType to none
 			else
-				m_Inputs[i][0] = InputType::None;
+				m_KeyInputs[i][0] = InputType::None;
 		}
-	}
-
-	void Input::EnqueueInput(int codeNum, InputType type)
-	{
-		if (codeNum < 0 || codeNum > NUM_INPUT_CODES)
-		{
-			VX_WARNING("Input code number " + std::to_string(codeNum) + " not supported, must be in range 0 - " + std::to_string(NUM_INPUT_CODES));
-			return;
-		}
-
-		m_Inputs[codeNum].push_back(type);
 	}
 
 }

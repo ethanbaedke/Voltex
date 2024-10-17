@@ -291,16 +291,165 @@ namespace VoltexEngine {
 		// Uncomment to see keycodes
 		VX_LOG(std::to_string(key));
 
-		// Key released
-		if (action == 0)
+		// Get the KeyCode
+		KeyCode code = KeyCode::None;
+		switch (key)
 		{
-			Input::EnqueueInput(key, Input::InputType::KeyUp);
+		case 32:
+			code = KeyCode::Space;
+			break;
+		case 48:
+			code = KeyCode::Num0;
+			break;
+		case 49:
+			code = KeyCode::Num1;
+			break;
+		case 50:
+			code = KeyCode::Num2;
+			break;
+		case 51:
+			code = KeyCode::Num3;
+			break;
+		case 52:
+			code = KeyCode::Num4;
+			break;
+		case 53:
+			code = KeyCode::Num5;
+			break;
+		case 54:
+			code = KeyCode::Num6;
+			break;
+		case 55:
+			code = KeyCode::Num7;
+			break;
+		case 56:
+			code = KeyCode::Num8;
+			break;
+		case 57:
+			code = KeyCode::Num9;
+			break;
+		case 65:
+			code = KeyCode::A;
+			break;
+		case 66:
+			code = KeyCode::B;
+			break;
+		case 67:
+			code = KeyCode::C;
+			break;
+		case 68:
+			code = KeyCode::D;
+			break;
+		case 69:
+			code = KeyCode::E;
+			break;
+		case 70:
+			code = KeyCode::F;
+			break;
+		case 71:
+			code = KeyCode::G;
+			break;
+		case 72:
+			code = KeyCode::H;
+			break;
+		case 73:
+			code = KeyCode::I;
+			break;
+		case 74:
+			code = KeyCode::J;
+			break;
+		case 75:
+			code = KeyCode::K;
+			break;
+		case 76:
+			code = KeyCode::L;
+			break;
+		case 77:
+			code = KeyCode::M;
+			break;
+		case 78:
+			code = KeyCode::N;
+			break;
+		case 79:
+			code = KeyCode::O;
+			break;
+		case 80:
+			code = KeyCode::P;
+			break;
+		case 81:
+			code = KeyCode::Q;
+			break;
+		case 82:
+			code = KeyCode::R;
+			break;
+		case 83:
+			code = KeyCode::S;
+			break;
+		case 84:
+			code = KeyCode::T;
+			break;
+		case 85:
+			code = KeyCode::U;
+			break;
+		case 86:
+			code = KeyCode::V;
+			break;
+		case 87:
+			code = KeyCode::W;
+			break;
+		case 88:
+			code = KeyCode::X;
+			break;
+		case 89:
+			code = KeyCode::Y;
+			break;
+		case 90:
+			code = KeyCode::Z;
+			break;
+		case 262:
+			code = KeyCode::RightArrow;
+			break;
+		case 263:
+			code = KeyCode::LeftArrow;
+			break;
+		case 264:
+			code = KeyCode::DownArrow;
+			break;
+		case 265:
+			code = KeyCode::UpArrow;
+			break;
+		case 257:
+			code = KeyCode::Enter;
+			break;
+		case 258:
+			code = KeyCode::Tab;
+			break;
+		case 340:
+			code = KeyCode::Shift;
+			break;
+		case 341:
+			code = KeyCode::Ctrl;
+			break;
+		case 342:
+			code = KeyCode::Alt;
+			break;
 		}
-		// Key pressed
-		else if (action == 1)
+
+		// Get the InputType
+		Input::InputType type;
+		switch (action)
 		{
-			Input::EnqueueInput(key, Input::InputType::KeyDown);
+		case 0:
+			type = Input::InputType::KeyUp;
+			break;
+		case 1:
+			type = Input::InputType::KeyDown;
+			break;
+		default:
+			return;
 		}
+
+		Input::EnqueueKey(code, type);
 	}
 
 }

@@ -3,71 +3,55 @@
 
 namespace VoltexEngine {
 
-	enum class InputCode
+	enum class KeyCode
 	{
-		SPACE = 32,
-		QUOTE = 39,
-		LESSTHAN = 44,
-		MINUS = 45,
-		GREATERTHAN = 46,
-		FORWARDSLASH = 47,
-		NUM0 = 48,
-		NUM1 = 49,
-		NUM2 = 50,
-		NUM3 = 51,
-		NUM4 = 52,
-		NUM5 = 53,
-		NUM6 = 54,
-		NUM7 = 55,
-		NUM8 = 56,
-		NUM9 = 57,
-		COLON = 59,
-		PLUS = 61,
-		A = 65,
-		B = 66,
-		C = 67,
-		D = 68,
-		E = 69,
-		F = 70,
-		G = 71,
-		H = 72,
-		I = 73,
-		J = 74,
-		K = 75,
-		L = 76,
-		M = 77,
-		N = 78,
-		O = 79,
-		P = 80,
-		Q = 81,
-		R = 82,
-		S = 83,
-		T = 84,
-		U = 85,
-		V = 86,
-		W = 87,
-		X = 88,
-		Y = 89,
-		Z = 90,
-		LBRACKET = 91,
-		BACKSLASH = 92,
-		RBRACKET = 93,
-		TILDE = 96,
-		ESC = 256,
-		ENTER = 257,
-		TAB = 258,
-		DELETE = 261,
-		RightArrow = 262,
-		LeftArrow = 263,
-		DownArrow = 264,
-		UpArrow = 265,
-		CAPSLK = 280,
-		LSHIFT = 340,
-		LCTRL = 341,
-		LALT = 342,
-		RALT = 346,
-		RSHIFT = 344,
-		RCTRL = 345
+		None = 0,
+		Num0 = 1,
+		Num1 = 2,
+		Num2 = 3,
+		Num3 = 4,
+		Num4 = 5,
+		Num5 = 6,
+		Num6 = 7,
+		Num7 = 8,
+		Num8 = 9,
+		Num9 = 10,
+		A = 11,
+		B = 12,
+		C = 13,
+		D = 14,
+		E = 15,
+		F = 16,
+		G = 17,
+		H = 18,
+		I = 19,
+		J = 20,
+		K = 21,
+		L = 22,
+		M = 23,
+		N = 24,
+		O = 25,
+		P = 26,
+		Q = 27,
+		R = 28,
+		S = 29,
+		T = 30,
+		U = 31,
+		V = 32,
+		W = 33,
+		X = 34,
+		Y = 35,
+		Z = 36,
+		RightArrow = 37,
+		UpArrow = 38,
+		LeftArrow = 39,
+		DownArrow = 40,
+		Tab = 41,
+		Shift = 42,
+		Ctrl = 43,
+		Alt = 44,
+		Space = 45,
+		Enter = 46
 	};
 
 	class Input
@@ -90,18 +74,19 @@ namespace VoltexEngine {
 		static void Tick();
 
 		/* The following functions return true if the InputCode has the passed has that InputType this frame, otherwise they return false */
-		static inline bool None(InputCode code) { return m_Inputs[static_cast<int>(code)][0] == InputType::None; }
-		static inline bool KeyDown(InputCode code) { return m_Inputs[static_cast<int>(code)][0] == InputType::KeyDown; }
-		static inline bool KeyUp(InputCode code) { return m_Inputs[static_cast<int>(code)][0] == InputType::KeyUp; }
+		static inline bool KeyNone(KeyCode code) { return m_KeyInputs[static_cast<int>(code)][0] == InputType::None; }
+		static inline bool KeyDown(KeyCode code) { return m_KeyInputs[static_cast<int>(code)][0] == InputType::KeyDown; }
+		static inline bool KeyUp(KeyCode code) { return m_KeyInputs[static_cast<int>(code)][0] == InputType::KeyUp; }
 
 		/* Add an input to the queue of a certain input code */
-		static void EnqueueInput(int codeNum, InputType type);
+		static inline void EnqueueKey(KeyCode code, InputType type) { m_KeyInputs[static_cast<int>(code)].push_back(type); }
 
 	private:
 
-		static const int NUM_INPUT_CODES = 266;
+		/* This should be one greater than the index of the final element in the KeyCodes enum */
+		static const int NUM_KEY_CODES = 47;
 
-		static std::vector<InputType> m_Inputs[NUM_INPUT_CODES];
+		static std::vector<InputType> m_KeyInputs[NUM_KEY_CODES];
 
 	};
 

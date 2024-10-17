@@ -77,19 +77,19 @@ public:
 		BounceObject::Update(deltaTime);
 
 		// Here we check for inputs, and set our y-direction accordingly
-		if (Input::KeyDown(InputCode::W) || Input::KeyDown(InputCode::UpArrow))
+		if (Input::KeyDown(KeyCode::W) || Input::KeyDown(KeyCode::UpArrow))
 		{
 			m_UpHeld = 1;
 		}
-		else if (Input::KeyUp(InputCode::W) || Input::KeyUp(InputCode::UpArrow))
+		else if (Input::KeyUp(KeyCode::W) || Input::KeyUp(KeyCode::UpArrow))
 		{
 			m_UpHeld = 0;
 		}
-		if (Input::KeyDown(InputCode::S) || Input::KeyDown(InputCode::DownArrow))
+		if (Input::KeyDown(KeyCode::S) || Input::KeyDown(KeyCode::DownArrow))
 		{
 			m_DownHeld = 1;
 		}
-		else if (Input::KeyUp(InputCode::S) || Input::KeyUp(InputCode::DownArrow))
+		else if (Input::KeyUp(KeyCode::S) || Input::KeyUp(KeyCode::DownArrow))
 		{
 			m_DownHeld = 0;
 		}
