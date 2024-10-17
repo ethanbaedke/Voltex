@@ -174,6 +174,7 @@ namespace VoltexEngine {
 
 		// Bind input callbacks
 		glfwSetKeyCallback(s_Window, KeyCallback);
+		glfwSetMouseButtonCallback(s_Window, ClickCallback);
 
 		VX_LOG("Renderer initialized");
 		return true;
@@ -288,11 +289,8 @@ namespace VoltexEngine {
 
 	void Renderer::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
 	{
-		// Uncomment to see keycodes
-		VX_LOG(std::to_string(key));
-
 		// Get the KeyCode
-		KeyCode code = KeyCode::None;
+		KeyCode code;
 		switch (key)
 		{
 		case 32:
@@ -433,23 +431,58 @@ namespace VoltexEngine {
 		case 342:
 			code = KeyCode::Alt;
 			break;
+		default:
+			return;
 		}
 
 		// Get the InputType
-		Input::InputType type;
+		Input::DiscreteType type;
 		switch (action)
 		{
 		case 0:
-			type = Input::InputType::KeyUp;
+			type = Input::DiscreteType::Up;
 			break;
 		case 1:
-			type = Input::InputType::KeyDown;
+			type = Input::DiscreteType::Down;
 			break;
 		default:
 			return;
 		}
 
 		Input::EnqueueKey(code, type);
+	}
+
+	void Renderer::ClickCallback(GLFWwindow* window, int button, int action, int mods)
+	{
+		// Get the KeyCode
+		ClickCode code;
+		switch (button)
+		{
+		case 0:
+			code = ClickCode::LeftMouse;
+			break;
+		case 1:
+			code = ClickCode::RightMouse;
+			break;
+		default:
+			return;
+		}
+
+		// Get the InputType
+		Input::DiscreteType type;
+		switch (action)
+		{
+		case 0:
+			type = Input::DiscreteType::Up;
+			break;
+		case 1:
+			type = Input::DiscreteType::Down;
+			break;
+		default:
+			return;
+		}
+
+		Input::EnqueueClick(code, type);
 	}
 
 }

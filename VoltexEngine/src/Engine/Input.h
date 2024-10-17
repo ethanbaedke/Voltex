@@ -5,53 +5,58 @@ namespace VoltexEngine {
 
 	enum class KeyCode
 	{
-		None = 0,
-		Num0 = 1,
-		Num1 = 2,
-		Num2 = 3,
-		Num3 = 4,
-		Num4 = 5,
-		Num5 = 6,
-		Num6 = 7,
-		Num7 = 8,
-		Num8 = 9,
-		Num9 = 10,
-		A = 11,
-		B = 12,
-		C = 13,
-		D = 14,
-		E = 15,
-		F = 16,
-		G = 17,
-		H = 18,
-		I = 19,
-		J = 20,
-		K = 21,
-		L = 22,
-		M = 23,
-		N = 24,
-		O = 25,
-		P = 26,
-		Q = 27,
-		R = 28,
-		S = 29,
-		T = 30,
-		U = 31,
-		V = 32,
-		W = 33,
-		X = 34,
-		Y = 35,
-		Z = 36,
-		RightArrow = 37,
-		UpArrow = 38,
-		LeftArrow = 39,
-		DownArrow = 40,
-		Tab = 41,
-		Shift = 42,
-		Ctrl = 43,
-		Alt = 44,
-		Space = 45,
-		Enter = 46
+		Num0 = 0,
+		Num1 = 1,
+		Num2 = 2,
+		Num3 = 3,
+		Num4 = 4,
+		Num5 = 5,
+		Num6 = 6,
+		Num7 = 7,
+		Num8 = 8,
+		Num9 = 9,
+		A = 10,
+		B = 11,
+		C = 12,
+		D = 13,
+		E = 14,
+		F = 15,
+		G = 16,
+		H = 17,
+		I = 18,
+		J = 19,
+		K = 20,
+		L = 21,
+		M = 22,
+		N = 23,
+		O = 24,
+		P = 25,
+		Q = 26,
+		R = 27,
+		S = 28,
+		T = 29,
+		U = 30,
+		V = 31,
+		W = 32,
+		X = 33,
+		Y = 34,
+		Z = 35,
+		RightArrow = 36,
+		UpArrow = 37,
+		LeftArrow = 38,
+		DownArrow = 39,
+		Tab = 40,
+		Shift = 41,
+		Ctrl = 42,
+		Alt = 43,
+		Space = 44,
+		Enter = 45
+	};
+
+	enum class ClickCode
+	{
+		LeftMouse = 0,
+		RightMouse = 1
 	};
 
 	class Input
@@ -59,11 +64,11 @@ namespace VoltexEngine {
 
 	public:
 
-		enum class InputType
+		enum class DiscreteType
 		{
 			None,
-			KeyDown,
-			KeyUp
+			Down,
+			Up
 		};
 
 	public:
@@ -73,20 +78,25 @@ namespace VoltexEngine {
 		/* Pushes the next queued InputType for every code into the front of the list */
 		static void Tick();
 
-		/* The following functions return true if the InputCode has the passed has that InputType this frame, otherwise they return false */
-		static inline bool KeyNone(KeyCode code) { return m_KeyInputs[static_cast<int>(code)][0] == InputType::None; }
-		static inline bool KeyDown(KeyCode code) { return m_KeyInputs[static_cast<int>(code)][0] == InputType::KeyDown; }
-		static inline bool KeyUp(KeyCode code) { return m_KeyInputs[static_cast<int>(code)][0] == InputType::KeyUp; }
+		/* The following functions return true if the code passed has the relevant input type, otherwise they return false */
+		static inline bool KeyNone(KeyCode code) { return m_DiscreteInputs[static_cast<int>(code)][0] == DiscreteType::None; }
+		static inline bool KeyDown(KeyCode code) { return m_DiscreteInputs[static_cast<int>(code)][0] == DiscreteType::Down; }
+		static inline bool KeyUp(KeyCode code) { return m_DiscreteInputs[static_cast<int>(code)][0] == DiscreteType::Up; }
+		static inline bool MouseNone(ClickCode code) { return m_DiscreteInputs[static_cast<int>(code) + NUM_KEY_CODES][0] == DiscreteType::None; }
+		static inline bool MouseDown(ClickCode code) { return m_DiscreteInputs[static_cast<int>(code) + NUM_KEY_CODES][0] == DiscreteType::Down; }
+		static inline bool MouseUp(ClickCode code) { return m_DiscreteInputs[static_cast<int>(code) + NUM_KEY_CODES][0] == DiscreteType::Up; }
 
 		/* Add an input to the queue of a certain input code */
-		static inline void EnqueueKey(KeyCode code, InputType type) { m_KeyInputs[static_cast<int>(code)].push_back(type); }
+		static inline void EnqueueKey(KeyCode code, DiscreteType type) { m_DiscreteInputs[static_cast<int>(code)].push_back(type); }
+		static inline void EnqueueClick(ClickCode code, DiscreteType type) { m_DiscreteInputs[static_cast<int>(code) + NUM_KEY_CODES].push_back(type); }
 
 	private:
 
-		/* This should be one greater than the index of the final element in the KeyCodes enum */
-		static const int NUM_KEY_CODES = 47;
+		/* This should be one greater than the index of the final element in the code menu enums */
+		static const int NUM_KEY_CODES = 46;
+		static const int NUM_CLICK_CODES = 2;
 
-		static std::vector<InputType> m_KeyInputs[NUM_KEY_CODES];
+		static std::vector<DiscreteType> m_DiscreteInputs[NUM_KEY_CODES + NUM_CLICK_CODES];
 
 	};
 

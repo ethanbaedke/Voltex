@@ -33,6 +33,7 @@ namespace VoltexEngine {
 		static unsigned int GenerateTexture(const std::string& texturePath, int* outWidth, int* outHeight);
 
 		static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+		static void ClickCallback(GLFWwindow* window, int button, int action, int mods);
 
 	};
 
