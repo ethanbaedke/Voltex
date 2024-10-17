@@ -139,3 +139,28 @@ project "VoltexGame"
     {
         "VoltexEngine"
     }
+
+project "VoltexTool"
+    location "VoltexTool"
+    kind "ConsoleApp"
+    language "C++"
+
+    files
+    {
+        "VoltexTool/src/**.h",
+        "VoltexTool/src/**.cpp",
+        "VoltexTool/textures/*.png"
+    }
+
+    includedirs
+    {
+        "VoltexEngine/src",
+        "GLFW/include",
+        "GLAD/include",
+        "GLM"
+    }
+
+    links
+    {
+        "VoltexEngine"
+    }
