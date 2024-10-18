@@ -3,7 +3,6 @@
 
 #include "Console.h"
 #include "FileLoader.h"
-#include "Sprite.h"
 #include "Input.h"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -20,6 +19,7 @@ namespace VoltexEngine {
 	int Renderer::s_WindowWidth;
 	int Renderer::s_WindowHeight;
 	GLuint Renderer::s_ShaderProgram;
+	GLuint Renderer::s_DefaultUITextureID;
 
 	bool Renderer::Init(int windowWidth, int windowHeight)
 	{
@@ -72,14 +72,6 @@ namespace VoltexEngine {
 		// Enable depth ordering for rendering
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
-
-		/*
-		* IF RENDERING GETS SLOW, LOOK HERE!
-		*
-		* Rather than creating different VAOs and buffers, we are using one for everything
-		* This is not the "correct" way to handle rendering, but I don't want to get trapped in premature optimization
-		* Once frames begin to drop, this should be the first place that is looked at for optimization
-		*/
 
 		// The window will use a single vertex array object
 		GLuint vao;
@@ -172,6 +164,10 @@ namespace VoltexEngine {
 		glVertexAttribPointer(vertexInTexCoords, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(5 * sizeof(float)));
 		glEnableVertexAttribArray(vertexInTexCoords);
 
+		// Load the UI texture
+		int defaultUITextureWidth, defaultUITextureHeight;
+		s_DefaultUITextureID = GenerateTexture("../VoltexEngine/textures/UIDefault.png", &defaultUITextureWidth, &defaultUITextureHeight);
+
 		// Bind input callbacks
 		glfwSetKeyCallback(s_Window, KeyCallback);
 		glfwSetMouseButtonCallback(s_Window, ClickCallback);
@@ -180,7 +176,7 @@ namespace VoltexEngine {
 		return true;
 	}
 
-	void Renderer::Tick(const std::vector<std::shared_ptr<GameObject>>& gameObjects)
+	void Renderer::Tick(const std::vector<std::shared_ptr<GameObject>>& gameObjects, std::shared_ptr<Gizmo> rootGizmo)
 	{
 		GLFWwindow* currentWindow = glfwGetCurrentContext();
 
@@ -198,55 +194,9 @@ namespace VoltexEngine {
 		glClearColor(0.13f, 0.16f, 0.27f, 1.0f); // Navy blue
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// The number of units visible on the screen horizontally
-		float zoomOut = 10.0f;
+		RenderGameObjects(gameObjects);
 
-		// Calculated from the center of the screen to the bounds
-		float unitsX = zoomOut / 2.0f;
-		float unitsY = ((float)s_WindowHeight / (float)s_WindowWidth) * unitsX;
-
-		// The game objects passed into this function have already been filtered, no need to check for expiration
-		for (std::shared_ptr<GameObject> obj : gameObjects)
-		{
-			if (std::shared_ptr<Sprite> spr = obj->GetSprite())
-			{
-				// Bind the texture for this sprite
-				glBindTexture(GL_TEXTURE_2D, spr->GetTextureID());
-
-				// Get the position, scale, and rotation of the game object
-				Vector position = obj->GetPosition();
-				float radianAngle = glm::radians(obj->GetRotation());
-				int depth = obj->GetDepth();
-
-				// Create and bind the model matrix
-				glm::mat4 modelMatrix = glm::mat4(1.0f);
-				modelMatrix = glm::translate(modelMatrix, glm::vec3(position.X(), position.Y(), depth));
-				modelMatrix = glm::rotate(modelMatrix, radianAngle, glm::vec3(0.0f, 0.0f, 1.0f));
-				modelMatrix = glm::scale(modelMatrix, glm::vec3((float)spr->GetWidth() / PPU, (float)spr->GetHeight() / PPU, 0.0f));
-				GLint vertexModelMatrix = glGetUniformLocation(s_ShaderProgram, "modelMatrix");
-				glUniformMatrix4fv(vertexModelMatrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));
-
-				// Create and bind the view matrix
-				glm::mat4 viewMatrix = glm::lookAt(
-					glm::vec3(0.0f, 0.0f, 5.0f),
-					glm::vec3(0.0f, 0.0f, 0.0f),
-					glm::vec3(0.0f, 1.0f, 0.0f)
-				);
-				GLint vertexViewMatrix = glGetUniformLocation(s_ShaderProgram, "viewMatrix");
-				glUniformMatrix4fv(vertexViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-
-				// Create and bind the projection matrix
-				glm::mat4 projectionMatrix = glm::ortho(-unitsX, unitsX, -unitsY, unitsY, 1.0f, 10.0f);
-				GLint vertexProjectionMatrix = glGetUniformLocation(s_ShaderProgram, "projectionMatrix");
-				glUniformMatrix4fv(vertexProjectionMatrix, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-
-				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-			}
-			else
-			{
-				glBindTexture(GL_TEXTURE_2D, 0);
-			}
-		}
+		RenderUI(rootGizmo);
 
 		glfwSwapBuffers(currentWindow);
 		glfwPollEvents();
@@ -483,6 +433,106 @@ namespace VoltexEngine {
 		}
 
 		Input::EnqueueClick(code, type);
+	}
+
+	void Renderer::RenderGameObjects(const std::vector<std::shared_ptr<GameObject>>& gameObjects)
+	{
+		// The number of units visible on the screen horizontally
+		float zoomOut = 10.0f;
+
+		// Calculated from the center of the screen to the bounds
+		float unitsX = zoomOut / 2.0f;
+		float unitsY = ((float)s_WindowHeight / (float)s_WindowWidth) * unitsX;
+
+		// The game objects passed into this function have already been filtered, no need to check for expiration
+		for (std::shared_ptr<GameObject> obj : gameObjects)
+		{
+			if (std::shared_ptr<Sprite> spr = obj->GetSprite())
+			{
+				// Bind the texture for this sprite
+				glBindTexture(GL_TEXTURE_2D, spr->GetTextureID());
+
+				// Get the position, scale, and rotation of the game object
+				Vector position = obj->GetPosition();
+				float radianAngle = glm::radians(obj->GetRotation());
+				int depth = obj->GetDepth();
+
+				// Create and bind the model matrix
+				glm::mat4 modelMatrix = glm::mat4(1.0f);
+				modelMatrix = glm::translate(modelMatrix, glm::vec3(position.X(), position.Y(), depth));
+				modelMatrix = glm::rotate(modelMatrix, radianAngle, glm::vec3(0.0f, 0.0f, 1.0f));
+				modelMatrix = glm::scale(modelMatrix, glm::vec3((float)spr->GetWidth() / PPU, (float)spr->GetHeight() / PPU, 0.0f));
+				GLint vertexModelMatrix = glGetUniformLocation(s_ShaderProgram, "modelMatrix");
+				glUniformMatrix4fv(vertexModelMatrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+
+				// Create and bind the view matrix
+				glm::mat4 viewMatrix = glm::lookAt(
+					glm::vec3(0.0f, 0.0f, 5.0f),
+					glm::vec3(0.0f, 0.0f, 0.0f),
+					glm::vec3(0.0f, 1.0f, 0.0f)
+				);
+				GLint vertexViewMatrix = glGetUniformLocation(s_ShaderProgram, "viewMatrix");
+				glUniformMatrix4fv(vertexViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+
+				// Create and bind the projection matrix
+				glm::mat4 projectionMatrix = glm::ortho(-unitsX, unitsX, -unitsY, unitsY, 1.0f, 10.0f);
+				GLint vertexProjectionMatrix = glGetUniformLocation(s_ShaderProgram, "projectionMatrix");
+				glUniformMatrix4fv(vertexProjectionMatrix, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+
+				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			}
+			else
+			{
+				glBindTexture(GL_TEXTURE_2D, 0);
+			}
+		}
+	}
+
+	void Renderer::RenderUI(std::shared_ptr<Gizmo> rootGizmo)
+	{
+		// Draw the gizmo to the screen
+		if (rootGizmo)
+		{
+			glBindTexture(GL_TEXTURE_2D, s_DefaultUITextureID);
+
+			// Depth first render all gizmos from the root down, render as we go
+			std::vector<std::shared_ptr<Gizmo>> renderStack;
+			renderStack.push_back(rootGizmo);
+
+			while (renderStack.size() > 0)
+			{
+				// Pop the next gizmo off the top of the stack
+				std::shared_ptr<Gizmo> currentGiz = renderStack.back();
+				renderStack.pop_back();
+
+				// Get the current gizmos children and add them to the render stack
+				std::vector<std::shared_ptr<Gizmo>> children = currentGiz->GetChildren();
+				for (std::shared_ptr<Gizmo> giz : children)
+					renderStack.push_back(giz);
+
+				float xP, yP, xS, yS;
+				currentGiz->GetDimensions(&xP, &yP, &xS, &yS);
+
+				// Create and bind the model matrix
+				glm::mat4 modelMatrix = glm::mat4(1.0f);
+				modelMatrix = glm::translate(modelMatrix, glm::vec3((2.0f * xP) + xS - 1.0f, (2.0f * yP) + yS - 1.0f, currentGiz->GetDepth()));
+				modelMatrix = glm::scale(modelMatrix, glm::vec3(xS * 2.0f, yS * 2.0f, 1.0f));
+				GLint vertexModelMatrix = glGetUniformLocation(s_ShaderProgram, "modelMatrix");
+				glUniformMatrix4fv(vertexModelMatrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+
+				// Create and bind the view matrix
+				glm::mat4 viewMatrix = glm::mat4(1.0f);
+				GLint vertexViewMatrix = glGetUniformLocation(s_ShaderProgram, "viewMatrix");
+				glUniformMatrix4fv(vertexViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+
+				// Create and bind the projection matrix
+				glm::mat4 projectionMatrix = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -4.0f, 1.0f);
+				GLint vertexProjectionMatrix = glGetUniformLocation(s_ShaderProgram, "projectionMatrix");
+				glUniformMatrix4fv(vertexProjectionMatrix, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+
+				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			}
+		}
 	}
 
 }

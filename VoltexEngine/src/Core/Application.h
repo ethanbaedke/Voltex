@@ -2,6 +2,7 @@
 #include "vxpch.h"
 
 #include "GameObject.h"
+#include "UI/Gizmo.h"
 
 namespace VoltexEngine {
 
@@ -19,6 +20,9 @@ namespace VoltexEngine {
 
 		/* Uninitialized game objects that need to be initialized next frame */
 		std::vector<std::shared_ptr<GameObject>> m_UninitializedGameObjects;
+
+		/* The root gizmo for UI rendering */
+		std::shared_ptr<Gizmo> m_RootGizmo;
 
 	public:
 
@@ -38,6 +42,10 @@ namespace VoltexEngine {
 		/* Creates and returns a Sprite
 		   If there are any errors reading the texture, returns nullptr */
 		std::shared_ptr<Sprite> CreateSprite(const std::string& texturePath);
+
+		/* Creates and returns a Gizmo */
+		std::shared_ptr<Gizmo> CreateGizmo();
+		inline void SetRootGizmo(std::shared_ptr<Gizmo> gizmo) { m_RootGizmo = gizmo; }
 
 	};
 

@@ -54,8 +54,12 @@ namespace VoltexEngine {
 			}
 			prevFrameTime = currentFrameTime;
 
+			// Update UI
+			if (m_RootGizmo)
+				m_RootGizmo->Tick();
+
 			// Render, by the time we do this any expired game objects have been removed already
-			Renderer::Tick(m_GameObjects);
+			Renderer::Tick(m_GameObjects, m_RootGizmo);
 		}
 	}
 
@@ -69,6 +73,12 @@ namespace VoltexEngine {
 
 		std::shared_ptr<Sprite> spr = std::make_shared<Sprite>(width, height, textureID);
 		return spr;
+	}
+
+	std::shared_ptr<Gizmo> Application::CreateGizmo()
+	{
+		std::shared_ptr<Gizmo> giz = std::make_shared<Gizmo>();
+		return giz;
 	}
 
 }

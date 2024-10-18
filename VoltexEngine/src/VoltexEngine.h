@@ -1,11 +1,13 @@
 #pragma once
 #include "vxpch.h"
 
-#include "Engine/Application.h"
-#include "Engine/Console.h"
-#include "Engine/Event.h"
-#include "Engine/Vector.h"
-#include "Engine/GameObject.h"
-#include "Engine/Printable.h"
-#include "Engine/Sprite.h"
-#include "Engine/Input.h"
+#include "Core/Application.h"
+#include "Core/Console.h"
+#include "Core/Event.h"
+#include "Core/Vector.h"
+#include "Core/GameObject.h"
+#include "Core/Printable.h"
+#include "Core/Sprite.h"
+#include "Core/Input.h"
+
+#include "UI/Gizmo.h"
