@@ -3,6 +3,11 @@
 
 using namespace VoltexEngine;
 
+/*
+* Voltex is a small engine that allows sprites to be bound to customizable objects and keyboard input to be handeled
+* Below is an example of a small application that has been made using classes within the engine
+*/
+
 /* Lets make an object that bounces left and right on the screen */
 class BounceObject : public GameObject
 {
@@ -30,7 +35,7 @@ public:
 		std::uniform_real_distribution<> dis(-2.0, 2.0);
 		float randomX = (float)dis(gen);
 		float randomY = (float)dis(gen);
-		
+
 		// Here we create a vector holding the random x and y values we generated
 		Vector randomPosition(randomX, randomY);
 
@@ -102,7 +107,7 @@ public:
 	}
 };
 
-/* This is and example of a game application */
+/* Lets create a class from the Application class, which handels creating and updating a window */
 class Game : public Application
 {
 
@@ -110,12 +115,12 @@ public:
 
 	Game()
 	{
-		// Create some sprites
+		// Here we create some sprites from images in our "textures" folder
 		std::shared_ptr<Sprite> barrelSprite = CreateSprite("textures/Barrel.png");
 		std::shared_ptr<Sprite> presentSprite = CreateSprite("textures/Present.png");
 		std::shared_ptr<Sprite> crateSprite = CreateSprite("textures/Crate.png");
 
-		// Create some instances of our custom game objects
+		// Here we create some instances of our custom game objects
 		std::shared_ptr<BounceObject> barrel = CreateObject<BounceObject>();
 		barrel->SetSprite(barrelSprite);
 
@@ -125,7 +130,7 @@ public:
 		std::shared_ptr<MoveObject> crate = CreateObject<MoveObject>();
 		crate->SetSprite(crateSprite);
 
-		// Here we tell our present to render in front, our barrel behind it, and our crate behind that
+		// Here we tell our objects to render in front or behind each other
 		present->SetDepth(1);
 		barrel->SetDepth(0);
 		crate->SetDepth(-1);
@@ -135,7 +140,7 @@ public:
 
 int main()
 {
-	// Make and run the engine
+	// In our main function, we create an instance of our game application, and we run it
 	std::unique_ptr<Game> game = std::make_unique<Game>();
 	game->Run();
 
