@@ -21,16 +21,22 @@ namespace VoltexEngine {
 		float m_SizeX;
 		float m_SizeY;
 
+		/* How much space this element should take up relative to its siblings in side by side layouts */
+		unsigned int m_Weight;
+
 		/* How far back or forward this element should be rendered */
 		int m_Depth;
 
+		/* Layout this element should use for its children */
 		UILayout m_Layout;
 
+		/* List of this elements child elements */
 		std::vector<std::shared_ptr<Gizmo>> m_Children;
 
 	public:
 
 		Gizmo();
+		Gizmo(unsigned int weight);
 
 		void Tick();
 

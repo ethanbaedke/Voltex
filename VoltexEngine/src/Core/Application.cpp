@@ -81,4 +81,41 @@ namespace VoltexEngine {
 		return giz;
 	}
 
+	std::shared_ptr<Gizmo> Application::CreateGizmo(UILayout layout)
+	{
+		std::shared_ptr<Gizmo> giz = std::make_shared<Gizmo>();
+		giz->SetLayout(layout);
+		return giz;
+	}
+
+	std::shared_ptr<Gizmo> Application::CreateGizmo(std::shared_ptr<Gizmo> parent)
+	{
+		std::shared_ptr<Gizmo> giz = std::make_shared<Gizmo>();
+		parent->AddChild(giz);
+		return giz;
+	}
+
+	std::shared_ptr<Gizmo> Application::CreateGizmo(std::shared_ptr<Gizmo> parent, UILayout layout)
+	{
+		std::shared_ptr<Gizmo> giz = std::make_shared<Gizmo>();
+		parent->AddChild(giz);
+		giz->SetLayout(layout);
+		return giz;
+	}
+
+	std::shared_ptr<Gizmo> Application::CreateGizmo(std::shared_ptr<Gizmo> parent, unsigned int weight)
+	{
+		std::shared_ptr<Gizmo> giz = std::make_shared<Gizmo>(weight);
+		parent->AddChild(giz);
+		return giz;
+	}
+
+	std::shared_ptr<Gizmo> Application::CreateGizmo(std::shared_ptr<Gizmo> parent, UILayout layout, unsigned int weight)
+	{
+		std::shared_ptr<Gizmo> giz = std::make_shared<Gizmo>(weight);
+		parent->AddChild(giz);
+		giz->SetLayout(layout);
+		return giz;
+	}
+
 }

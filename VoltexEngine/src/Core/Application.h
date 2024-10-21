@@ -45,6 +45,12 @@ namespace VoltexEngine {
 
 		/* Creates and returns a Gizmo */
 		std::shared_ptr<Gizmo> CreateGizmo();
+		std::shared_ptr<Gizmo> CreateGizmo(UILayout layout);
+		std::shared_ptr<Gizmo> CreateGizmo(std::shared_ptr<Gizmo> parent);
+		std::shared_ptr<Gizmo> CreateGizmo(std::shared_ptr<Gizmo> parent, UILayout layout);
+		std::shared_ptr<Gizmo> CreateGizmo(std::shared_ptr<Gizmo> parent, unsigned int weight);
+		std::shared_ptr<Gizmo> CreateGizmo(std::shared_ptr<Gizmo> parent, UILayout layout, unsigned int weight);
+
 		inline void SetRootGizmo(std::shared_ptr<Gizmo> gizmo) { m_RootGizmo = gizmo; }
 
 	};

@@ -12,16 +12,16 @@ public:
 		std::shared_ptr<Gizmo> g1 = CreateGizmo();
 		SetRootGizmo(g1);
 
-		std::shared_ptr<Gizmo> g2 = CreateGizmo();
-		std::shared_ptr<Gizmo> g3 = CreateGizmo();
-		g1->AddChild(g2);
-		g1->AddChild(g3);
+		std::shared_ptr<Gizmo> g2 = CreateGizmo(g1, UILayout::Vertical, 2);
+		std::shared_ptr<Gizmo> g5 = CreateGizmo(g2);
+		std::shared_ptr<Gizmo> g6 = CreateGizmo(g2, 2);
 
-		g2->SetLayout(UILayout::Vertical);
-		std::shared_ptr<Gizmo> g4 = CreateGizmo();
-		std::shared_ptr<Gizmo> g5 = CreateGizmo();
-		g2->AddChild(g4);
-		g2->AddChild(g5);
+		std::shared_ptr<Gizmo> g3 = CreateGizmo(g1);
+
+		std::shared_ptr<Gizmo> g4 = CreateGizmo(g1, UILayout::Vertical);
+		std::shared_ptr<Gizmo> g7 = CreateGizmo(g4);
+		std::shared_ptr<Gizmo> g8 = CreateGizmo(g4);
+
 	}
 
 };
