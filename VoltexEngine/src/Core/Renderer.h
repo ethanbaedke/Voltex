@@ -37,6 +37,9 @@ namespace VoltexEngine {
 
 		static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 		static void ClickCallback(GLFWwindow* window, int button, int action, int mods);
+		static void CursorCallback(GLFWwindow* window, double xPos, double yPos);
+
+		inline static bool GetCursorEnabled() { return glfwGetInputMode(s_Window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL; }
 
 	private:
 

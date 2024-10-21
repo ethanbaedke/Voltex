@@ -170,6 +170,7 @@ namespace VoltexEngine {
 		// Bind input callbacks
 		glfwSetKeyCallback(s_Window, KeyCallback);
 		glfwSetMouseButtonCallback(s_Window, ClickCallback);
+		glfwSetCursorPosCallback(s_Window, CursorCallback);
 
 		VX_LOG("Renderer initialized");
 		return true;
@@ -432,6 +433,14 @@ namespace VoltexEngine {
 		}
 
 		Input::EnqueueClick(code, type);
+	}
+
+	void Renderer::CursorCallback(GLFWwindow* window, double xPos, double yPos)
+	{
+		if (xPos > s_WindowWidth || yPos > s_WindowHeight)
+			return;
+
+		Input::SetCursorPosition(xPos / s_WindowWidth, 1 - (yPos / s_WindowHeight));
 	}
 
 	void Renderer::RenderGameObjects(const std::vector<std::shared_ptr<GameObject>>& gameObjects)

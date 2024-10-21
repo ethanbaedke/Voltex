@@ -17,10 +17,10 @@ namespace VoltexEngine {
 
 		Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 
-		inline unsigned char R() { return m_R; }
-		inline unsigned char G() { return m_G; }
-		inline unsigned char B() { return m_B; }
-		inline unsigned char A() { return m_A; }
+		inline unsigned char R() const { return m_R; }
+		inline unsigned char G() const { return m_G; }
+		inline unsigned char B() const { return m_B; }
+		inline unsigned char A() const { return m_A; }
 
 	};
 

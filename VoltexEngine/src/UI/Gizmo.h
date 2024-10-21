@@ -1,12 +1,18 @@
 #pragma once
 #include "vxpch.h"
 
+#include "Core/Printable.h"
 #include "Core/Color.h"
 
 namespace VoltexEngine {
 
-	class Gizmo
+	class Gizmo : public IPrintable
 	{
+
+	private:
+
+		// TODO: Make a gizmo manager and handle this, THIS IS BAD
+		static Gizmo* s_Focused;
 
 	protected:
 
@@ -25,6 +31,8 @@ namespace VoltexEngine {
 	private:
 
 		Color m_Color;
+		Color m_DefaultColor;
+		Color m_FocusedColor;
 
 	public:
 
@@ -35,13 +43,18 @@ namespace VoltexEngine {
 		void SetDimensions(float xPos, float yPos, float xSize, float ySize);
 		void GetDimensions(float* outXPos, float* outYPos, float* outXSize, float* outYSize) const;
 
+		void HandleCursorEnter();
+		void HandleCursorLeave();
+
+		void SetColor(const Color& color);
+
 		inline void SetDepth(int depth) { m_Depth = depth; }
 		inline int GetDepth() const { return m_Depth; }
 		inline void SetWeight(unsigned int weight) { m_Weight = weight; }
 		inline unsigned int GetWeight() const { return m_Weight; }
-		inline void SetColor(const Color& color) { m_Color = color; }
 		inline const Color& GetColor() const { return m_Color; }
 
+		virtual std::string GetPrintable() const override;
 	};
 
 }
