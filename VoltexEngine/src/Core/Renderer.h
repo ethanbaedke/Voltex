@@ -3,7 +3,7 @@
 
 #include "GameObject.h"
 #include "Sprite.h"
-#include "UI/Gizmo.h"
+#include "UI/LayoutGizmo.h"
 
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
@@ -30,7 +30,7 @@ namespace VoltexEngine {
 		static bool Init(int windowWidth, int windowHeight);
 
 		/* Update all images on the screen */
-		static void Tick(const std::vector<std::shared_ptr<GameObject>>& gameObjects, std::shared_ptr<Gizmo> rootGizmo);
+		static void Tick(const std::vector<std::shared_ptr<GameObject>>& gameObjects, std::shared_ptr<LayoutGizmo> rootGizmo);
 
 		/* Reads the image at texture path, generates a texture, and returns its textureID */
 		static unsigned int GenerateTexture(const std::string& texturePath, int* outWidth, int* outHeight);
@@ -41,7 +41,7 @@ namespace VoltexEngine {
 	private:
 
 		static void RenderGameObjects(const std::vector<std::shared_ptr<GameObject>>& gameObjects);
-		static void RenderUI(std::shared_ptr<Gizmo> rootGizmo);
+		static void RenderUI(std::shared_ptr<LayoutGizmo> rootGizmo);
 
 	};
 

@@ -9,19 +9,25 @@ public:
 
 	Tool()
 	{
-		std::shared_ptr<Gizmo> g1 = CreateGizmo();
+		std::shared_ptr<HorizontalLayoutGizmo> g1 = CreateGizmo<HorizontalLayoutGizmo>();
 		SetRootGizmo(g1);
 
-		std::shared_ptr<Gizmo> g2 = CreateGizmo(g1, UILayout::Vertical, 2);
-		std::shared_ptr<Gizmo> g5 = CreateGizmo(g2);
-		std::shared_ptr<Gizmo> g6 = CreateGizmo(g2, 2);
+		std::shared_ptr<VerticalLayoutGizmo> g2 = CreateGizmo<VerticalLayoutGizmo>(); g2->SetWeight(2);
+		std::shared_ptr<HorizontalLayoutGizmo> g3 = CreateGizmo<HorizontalLayoutGizmo>();
+		std::shared_ptr<HorizontalLayoutGizmo> g4 = CreateGizmo<HorizontalLayoutGizmo>();
+		g1->AddChild(g2);
+		g1->AddChild(g3);
+		g1->AddChild(g4);
 
-		std::shared_ptr<Gizmo> g3 = CreateGizmo(g1);
+		std::shared_ptr<HorizontalLayoutGizmo> g5 = CreateGizmo<HorizontalLayoutGizmo>();
+		std::shared_ptr<HorizontalLayoutGizmo> g6 = CreateGizmo<HorizontalLayoutGizmo>(); g6->SetWeight(2);
+		g2->AddChild(g5);
+		g2->AddChild(g6);
 
-		std::shared_ptr<Gizmo> g4 = CreateGizmo(g1, UILayout::Vertical);
-		std::shared_ptr<Gizmo> g7 = CreateGizmo(g4);
-		std::shared_ptr<Gizmo> g8 = CreateGizmo(g4);
-
+		std::shared_ptr<HorizontalLayoutGizmo> g7 = CreateGizmo<HorizontalLayoutGizmo>();
+		std::shared_ptr<HorizontalLayoutGizmo> g8 = CreateGizmo<HorizontalLayoutGizmo>();
+		g4->AddChild(g7);
+		g4->AddChild(g8);
 	}
 
 };

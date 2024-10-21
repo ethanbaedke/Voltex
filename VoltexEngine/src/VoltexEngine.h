@@ -10,4 +10,5 @@
 #include "Core/Sprite.h"
 #include "Core/Input.h"
 
-#include "UI/Gizmo.h"
+#include "UI/HorizontalLayoutGizmo.h"
+#include "UI/VerticalLayoutGizmo.h"

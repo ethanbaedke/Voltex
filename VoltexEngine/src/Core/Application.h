@@ -2,7 +2,7 @@
 #include "vxpch.h"
 
 #include "GameObject.h"
-#include "UI/Gizmo.h"
+#include "UI/LayoutGizmo.h"
 
 namespace VoltexEngine {
 
@@ -22,7 +22,7 @@ namespace VoltexEngine {
 		std::vector<std::shared_ptr<GameObject>> m_UninitializedGameObjects;
 
 		/* The root gizmo for UI rendering */
-		std::shared_ptr<Gizmo> m_RootGizmo;
+		std::shared_ptr<LayoutGizmo> m_RootGizmo;
 
 	public:
 
@@ -44,14 +44,13 @@ namespace VoltexEngine {
 		std::shared_ptr<Sprite> CreateSprite(const std::string& texturePath);
 
 		/* Creates and returns a Gizmo */
-		std::shared_ptr<Gizmo> CreateGizmo();
-		std::shared_ptr<Gizmo> CreateGizmo(UILayout layout);
-		std::shared_ptr<Gizmo> CreateGizmo(std::shared_ptr<Gizmo> parent);
-		std::shared_ptr<Gizmo> CreateGizmo(std::shared_ptr<Gizmo> parent, UILayout layout);
-		std::shared_ptr<Gizmo> CreateGizmo(std::shared_ptr<Gizmo> parent, unsigned int weight);
-		std::shared_ptr<Gizmo> CreateGizmo(std::shared_ptr<Gizmo> parent, UILayout layout, unsigned int weight);
-
-		inline void SetRootGizmo(std::shared_ptr<Gizmo> gizmo) { m_RootGizmo = gizmo; }
+		template <typename T>
+		std::shared_ptr<T> CreateGizmo()
+		{
+			std::shared_ptr<T> giz = std::make_shared<T>();
+			return giz;
+		}
+		inline void SetRootGizmo(std::shared_ptr<LayoutGizmo> gizmo) { m_RootGizmo = gizmo; }
 
 	};
 
