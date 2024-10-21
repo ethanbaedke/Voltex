@@ -9,6 +9,7 @@
 #include "Core/Printable.h"
 #include "Core/Sprite.h"
 #include "Core/Input.h"
+#include "Core/Color.h"
 
 #include "UI/HorizontalLayoutGizmo.h"
 #include "UI/VerticalLayoutGizmo.h"

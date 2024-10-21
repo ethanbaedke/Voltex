@@ -1,6 +1,8 @@
 #pragma once
 #include "vxpch.h"
 
+#include "Core/Color.h"
+
 namespace VoltexEngine {
 
 	class Gizmo
@@ -20,6 +22,10 @@ namespace VoltexEngine {
 		/* How much space this element should take up relative to its siblings if in a weighted layout */
 		unsigned int m_Weight;
 
+	private:
+
+		Color m_Color;
+
 	public:
 
 		Gizmo();
@@ -33,6 +39,8 @@ namespace VoltexEngine {
 		inline int GetDepth() const { return m_Depth; }
 		inline void SetWeight(unsigned int weight) { m_Weight = weight; }
 		inline unsigned int GetWeight() const { return m_Weight; }
+		inline void SetColor(const Color& color) { m_Color = color; }
+		inline const Color& GetColor() const { return m_Color; }
 
 	};
 

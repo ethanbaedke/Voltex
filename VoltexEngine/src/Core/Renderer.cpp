@@ -131,11 +131,11 @@ namespace VoltexEngine {
 
 		// Set the vertices
 		GLfloat vertices[] = {
-			//	Position		Color				TexCoords
-				-0.5f, -0.5f,	1.0f, 1.0f, 1.0f,	0.0f, 1.0f,
-				0.5f, -0.5f,	1.0f, 1.0f, 1.0f,	1.0f, 1.0f,
-				0.5f, 0.5f,		1.0f, 1.0f, 1.0f,	1.0f, 0.0f,
-				-0.5f, 0.5f,	1.0f, 1.0f, 1.0f,	0.0f, 0.0f
+			//	Position		TexCoords
+				-0.5f, -0.5f,	0.0f, 1.0f,
+				0.5f, -0.5f,	1.0f, 1.0f,
+				0.5f, 0.5f,		1.0f, 0.0f,
+				-0.5f, 0.5f,	0.0f, 0.0f
 		};
 
 		GLuint elements[] = {
@@ -151,22 +151,21 @@ namespace VoltexEngine {
 
 		// Set the position on the vertex
 		GLint vertexInPosition = glGetAttribLocation(s_ShaderProgram, "inPosition");
-		glVertexAttribPointer(vertexInPosition, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), 0);
+		glVertexAttribPointer(vertexInPosition, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
 		glEnableVertexAttribArray(vertexInPosition);
-
-		// Set the color on the vertex
-		GLint vertexInColor = glGetAttribLocation(s_ShaderProgram, "inColor");
-		glVertexAttribPointer(vertexInColor, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(2 * sizeof(float)));
-		glEnableVertexAttribArray(vertexInColor);
 
 		// Set the texture coordinates on the vertex
 		GLint vertexInTexCoords = glGetAttribLocation(s_ShaderProgram, "inTexCoords");
-		glVertexAttribPointer(vertexInTexCoords, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(5 * sizeof(float)));
+		glVertexAttribPointer(vertexInTexCoords, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 		glEnableVertexAttribArray(vertexInTexCoords);
 
 		// Load the UI texture
 		int defaultUITextureWidth, defaultUITextureHeight;
 		s_DefaultUITextureID = GenerateTexture("../VoltexEngine/textures/UIDefault.png", &defaultUITextureWidth, &defaultUITextureHeight);
+
+		// Enable transparency rendering
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		// Bind input callbacks
 		glfwSetKeyCallback(s_Window, KeyCallback);
@@ -513,6 +512,11 @@ namespace VoltexEngine {
 
 				float xP, yP, xS, yS;
 				currentGiz->GetDimensions(&xP, &yP, &xS, &yS);
+
+				// Set the UI color on the fragment shader
+				Color uiColor = currentGiz->GetColor();
+				GLint fragmentColor = glGetUniformLocation(s_ShaderProgram, "color");
+				glUniform4f(fragmentColor, uiColor.R() / 255.0f, uiColor.G() / 255.0f, uiColor.B() / 255.0f, uiColor.A() / 255.0f);
 
 				// Create and bind the model matrix
 				glm::mat4 modelMatrix = glm::mat4(1.0f);
