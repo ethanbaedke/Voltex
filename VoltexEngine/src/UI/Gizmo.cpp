@@ -5,7 +5,7 @@
 
 namespace VoltexEngine {
 
-	Gizmo* Gizmo::s_Focused;
+	std::shared_ptr<Gizmo> Gizmo::s_Focused;
 
 	Gizmo::Gizmo()
 		: m_PosX(0.0f), m_PosY(0.0f), m_SizeX(1.0f), m_SizeY(1.0f), m_Depth(0), m_Weight(1), m_Color(Color(255, 255, 255, 255)), m_DefaultColor(Color(255, 255, 255, 255)), m_FocusedColor(Color(128, 128, 128, 255))
@@ -30,13 +30,13 @@ namespace VoltexEngine {
 
 	void Gizmo::HandleCursorEnter()
 	{
-		if (s_Focused == this)
+		if (s_Focused == shared_from_this())
 			return;
 
 		if (s_Focused)
 			s_Focused->HandleCursorLeave();
 
-		s_Focused = this;
+		s_Focused = shared_from_this();
 		m_Color = m_FocusedColor;
 	}
 

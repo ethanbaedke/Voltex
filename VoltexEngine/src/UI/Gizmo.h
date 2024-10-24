@@ -6,13 +6,13 @@
 
 namespace VoltexEngine {
 
-	class Gizmo : public IPrintable
+	class Gizmo : public IPrintable, public std::enable_shared_from_this<Gizmo>
 	{
 
 	private:
 
-		// TODO: Make a gizmo manager and handle this, THIS IS BAD
-		static Gizmo* s_Focused;
+		// Only one gizmo can ever be focused at a time so we store it here statically
+		static std::shared_ptr<Gizmo> s_Focused;
 
 	protected:
 
