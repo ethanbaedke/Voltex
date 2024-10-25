@@ -176,7 +176,7 @@ namespace VoltexEngine {
 		return true;
 	}
 
-	void Renderer::Tick(const std::vector<std::shared_ptr<GameObject>>& gameObjects, std::shared_ptr<LayoutGizmo> rootGizmo)
+	void Renderer::Tick(const std::vector<std::shared_ptr<GameObject>>& gameObjects, std::vector<std::shared_ptr<Gizmo>> gizmos)
 	{
 		GLFWwindow* currentWindow = glfwGetCurrentContext();
 
@@ -196,7 +196,7 @@ namespace VoltexEngine {
 
 		RenderGameObjects(gameObjects);
 
-		RenderUI(rootGizmo);
+		RenderUI(gizmos);
 
 		glfwSwapBuffers(currentWindow);
 		glfwPollEvents();
@@ -496,56 +496,39 @@ namespace VoltexEngine {
 		}
 	}
 
-	void Renderer::RenderUI(std::shared_ptr<LayoutGizmo> rootGizmo)
+	void Renderer::RenderUI(std::vector<std::shared_ptr<Gizmo>> gizmos)
 	{
 		// Draw the gizmo to the screen
-		if (rootGizmo)
+		glBindTexture(GL_TEXTURE_2D, s_DefaultUITextureID);
+
+		for (std::shared_ptr<Gizmo> giz : gizmos)
 		{
-			glBindTexture(GL_TEXTURE_2D, s_DefaultUITextureID);
+			float xP, yP, xS, yS;
+			giz->GetDimensions(&xP, &yP, &xS, &yS);
 
-			// Depth first render all layout gizmos from the root down, render as we go
-			std::vector<std::shared_ptr<LayoutGizmo>> renderStack;
-			renderStack.push_back(rootGizmo);
+			// Set the UI color on the fragment shader
+			Color uiColor = giz->GetColor();
+			GLint fragmentColor = glGetUniformLocation(s_ShaderProgram, "color");
+			glUniform4f(fragmentColor, uiColor.R() / 255.0f, uiColor.G() / 255.0f, uiColor.B() / 255.0f, uiColor.A() / 255.0f);
 
-			while (renderStack.size() > 0)
-			{
-				// Pop the next gizmo off the top of the stack
-				std::shared_ptr<LayoutGizmo> currentGiz = renderStack.back();
-				renderStack.pop_back();
+			// Create and bind the model matrix
+			glm::mat4 modelMatrix = glm::mat4(1.0f);
+			modelMatrix = glm::translate(modelMatrix, glm::vec3((2.0f * xP) + xS - 1.0f, (2.0f * yP) + yS - 1.0f, giz->GetDepth()));
+			modelMatrix = glm::scale(modelMatrix, glm::vec3(xS * 2.0f, yS * 2.0f, 1.0f));
+			GLint vertexModelMatrix = glGetUniformLocation(s_ShaderProgram, "modelMatrix");
+			glUniformMatrix4fv(vertexModelMatrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 
-				// Get the current gizmos children and add the layout gizmos to the render stack
-				std::vector<std::shared_ptr<Gizmo>> children = currentGiz->GetChildren();
-				for (std::shared_ptr<Gizmo> giz : children)
-					if (std::shared_ptr<LayoutGizmo> layGiz = std::dynamic_pointer_cast<LayoutGizmo>(giz))
-						renderStack.push_back(layGiz);
+			// Create and bind the view matrix
+			glm::mat4 viewMatrix = glm::mat4(1.0f);
+			GLint vertexViewMatrix = glGetUniformLocation(s_ShaderProgram, "viewMatrix");
+			glUniformMatrix4fv(vertexViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 
-				float xP, yP, xS, yS;
-				currentGiz->GetDimensions(&xP, &yP, &xS, &yS);
+			// Create and bind the projection matrix
+			glm::mat4 projectionMatrix = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -4.0f, 1.0f);
+			GLint vertexProjectionMatrix = glGetUniformLocation(s_ShaderProgram, "projectionMatrix");
+			glUniformMatrix4fv(vertexProjectionMatrix, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 
-				// Set the UI color on the fragment shader
-				Color uiColor = currentGiz->GetColor();
-				GLint fragmentColor = glGetUniformLocation(s_ShaderProgram, "color");
-				glUniform4f(fragmentColor, uiColor.R() / 255.0f, uiColor.G() / 255.0f, uiColor.B() / 255.0f, uiColor.A() / 255.0f);
-
-				// Create and bind the model matrix
-				glm::mat4 modelMatrix = glm::mat4(1.0f);
-				modelMatrix = glm::translate(modelMatrix, glm::vec3((2.0f * xP) + xS - 1.0f, (2.0f * yP) + yS - 1.0f, currentGiz->GetDepth()));
-				modelMatrix = glm::scale(modelMatrix, glm::vec3(xS * 2.0f, yS * 2.0f, 1.0f));
-				GLint vertexModelMatrix = glGetUniformLocation(s_ShaderProgram, "modelMatrix");
-				glUniformMatrix4fv(vertexModelMatrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));
-
-				// Create and bind the view matrix
-				glm::mat4 viewMatrix = glm::mat4(1.0f);
-				GLint vertexViewMatrix = glGetUniformLocation(s_ShaderProgram, "viewMatrix");
-				glUniformMatrix4fv(vertexViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-
-				// Create and bind the projection matrix
-				glm::mat4 projectionMatrix = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -4.0f, 1.0f);
-				GLint vertexProjectionMatrix = glGetUniformLocation(s_ShaderProgram, "projectionMatrix");
-				glUniformMatrix4fv(vertexProjectionMatrix, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-
-				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-			}
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}
 	}
 

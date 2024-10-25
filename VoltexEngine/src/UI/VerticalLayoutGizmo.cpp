@@ -20,7 +20,6 @@ namespace VoltexEngine {
 			currentY -= sizeY;
 			m_Children[i]->SetDimensions(m_PosX, currentY, m_SizeX, sizeY);
 			m_Children[i]->SetDepth(m_Depth + 1);
-			m_Children[i]->Tick();
 		}
 	}
 

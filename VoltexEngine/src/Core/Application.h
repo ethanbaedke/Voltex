@@ -21,8 +21,8 @@ namespace VoltexEngine {
 		/* Uninitialized game objects that need to be initialized next frame */
 		std::vector<std::shared_ptr<GameObject>> m_UninitializedGameObjects;
 
-		/* The root gizmo for UI rendering */
-		std::shared_ptr<LayoutGizmo> m_RootGizmo;
+		/* Gizmos for UI rendering */
+		std::vector<std::shared_ptr<Gizmo>> m_Gizmos;
 
 	public:
 
@@ -48,9 +48,9 @@ namespace VoltexEngine {
 		std::shared_ptr<T> CreateGizmo()
 		{
 			std::shared_ptr<T> giz = std::make_shared<T>();
+			m_Gizmos.push_back(giz);
 			return giz;
 		}
-		inline void SetRootGizmo(std::shared_ptr<LayoutGizmo> gizmo) { m_RootGizmo = gizmo; }
 
 	};
 

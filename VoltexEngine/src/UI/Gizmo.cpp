@@ -7,6 +7,20 @@ namespace VoltexEngine {
 
 	std::shared_ptr<Gizmo> Gizmo::s_Focused;
 
+	void Gizmo::CursorOverlap(std::shared_ptr<Gizmo> gizmo)
+	{
+		if (s_Focused == gizmo)
+			return;
+
+		if (s_Focused)
+			s_Focused->HandleCursorLeave();
+
+		if (gizmo)
+			gizmo->HandleCursorEnter();
+
+		s_Focused = gizmo;
+	}
+
 	Gizmo::Gizmo()
 		: m_PosX(0.0f), m_PosY(0.0f), m_SizeX(1.0f), m_SizeY(1.0f), m_Depth(0), m_Weight(1), m_Color(Color(255, 255, 255, 255)), m_DefaultColor(Color(255, 255, 255, 255)), m_FocusedColor(Color(128, 128, 128, 255))
 	{
@@ -28,23 +42,6 @@ namespace VoltexEngine {
 		*outYSize = m_SizeY;
 	}
 
-	void Gizmo::HandleCursorEnter()
-	{
-		if (s_Focused == shared_from_this())
-			return;
-
-		if (s_Focused)
-			s_Focused->HandleCursorLeave();
-
-		s_Focused = shared_from_this();
-		m_Color = m_FocusedColor;
-	}
-
-	void Gizmo::HandleCursorLeave()
-	{
-		m_Color = m_DefaultColor;
-	}
-
 	void Gizmo::SetColor(const Color& color)
 	{
 		m_Color = color;
@@ -58,6 +55,16 @@ namespace VoltexEngine {
 		std::string size = "Size: (" + std::to_string(m_SizeX) + ", " + std::to_string(m_SizeY) + ") ";
 		std::string depth = "Depth: (" + std::to_string(m_Depth) + ") ";
 		return position + size + depth;
+	}
+
+	void Gizmo::HandleCursorEnter()
+	{
+		m_Color = m_FocusedColor;
+	}
+
+	void Gizmo::HandleCursorLeave()
+	{
+		m_Color = m_DefaultColor;
 	}
 
 }

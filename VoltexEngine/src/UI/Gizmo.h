@@ -14,6 +14,10 @@ namespace VoltexEngine {
 		// Only one gizmo can ever be focused at a time so we store it here statically
 		static std::shared_ptr<Gizmo> s_Focused;
 
+	public:
+
+		static void CursorOverlap(std::shared_ptr<Gizmo> gizmo);
+
 	protected:
 
 		/* The position and size of this gizmo in UI coordinates */
@@ -43,9 +47,6 @@ namespace VoltexEngine {
 		void SetDimensions(float xPos, float yPos, float xSize, float ySize);
 		void GetDimensions(float* outXPos, float* outYPos, float* outXSize, float* outYSize) const;
 
-		void HandleCursorEnter();
-		void HandleCursorLeave();
-
 		void SetColor(const Color& color);
 
 		inline void SetDepth(int depth) { m_Depth = depth; }
@@ -55,6 +56,12 @@ namespace VoltexEngine {
 		inline const Color& GetColor() const { return m_Color; }
 
 		virtual std::string GetPrintable() const override;
+
+	private:
+
+		void HandleCursorEnter();
+		void HandleCursorLeave();
+
 	};
 
 }

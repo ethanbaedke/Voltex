@@ -39,39 +39,20 @@ namespace VoltexEngine {
 				float curX, curY;
 				Input::GetCursorPosition(&curX, &curY);
 
-				// Depth first check all gizmos for an overlap with the cursor
-				std::vector<std::shared_ptr<Gizmo>> gizmoStack;
-				gizmoStack.push_back(m_RootGizmo);
-
-				int counter = 0;
-				while (gizmoStack.size() > 0)
+				for (std::shared_ptr<Gizmo> giz : m_Gizmos)
 				{
-					counter++;
-					// Pop the next gizmo off the top of the stack
-					std::shared_ptr<Gizmo> currentGiz = gizmoStack.back();
-					gizmoStack.pop_back();
-
-					// If our current gizmo is a layout gizmo, add all its children to the gizmo stack
-					if (std::shared_ptr<LayoutGizmo> layGiz = std::dynamic_pointer_cast<LayoutGizmo>(currentGiz))
-					{
-						std::vector<std::shared_ptr<Gizmo>> children = layGiz->GetChildren();
-						for (std::shared_ptr<Gizmo> giz : children)
-							gizmoStack.push_back(giz);
-					}
-
 					// If our current gizmo is at a lower depth than our hit gizmo, ignore it
-					if (hit && currentGiz->GetDepth() < hit->GetDepth())
+					if (hit && giz->GetDepth() < hit->GetDepth())
 						continue;
 
 					// TODO: Check if the cursor overlaps the gizmo
 					float x, y, w, h;
-					currentGiz->GetDimensions(&x, &y, &w, &h);
+					giz->GetDimensions(&x, &y, &w, &h);
 					if (x < curX && curX < (x + w) && y < curY && curY < (y + h))
-						hit = currentGiz;
+						hit = giz;
 				}
 
-				if (hit)
-					hit->HandleCursorEnter();
+				Gizmo::CursorOverlap(hit);
 			}
 
 			// Initialize any uninitialized game objects
@@ -91,18 +72,15 @@ namespace VoltexEngine {
 			auto currentFrameTime = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<float> deltaTime = currentFrameTime - prevFrameTime;
 			for (std::shared_ptr<GameObject> obj : m_GameObjects)
-			{
-				// Update game object
 				obj->Update(deltaTime.count());
-			}
 			prevFrameTime = currentFrameTime;
 
 			// Update UI
-			if (m_RootGizmo)
-				m_RootGizmo->Tick();
+			for (std::shared_ptr<Gizmo> giz : m_Gizmos)
+				giz->Tick();
 
 			// Render, by the time we do this any expired game objects have been removed already
-			Renderer::Tick(m_GameObjects, m_RootGizmo);
+			Renderer::Tick(m_GameObjects, m_Gizmos);
 		}
 	}
 
