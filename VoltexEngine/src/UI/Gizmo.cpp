@@ -22,7 +22,7 @@ namespace VoltexEngine {
 	}
 
 	Gizmo::Gizmo()
-		: m_PosX(0.0f), m_PosY(0.0f), m_SizeX(1.0f), m_SizeY(1.0f), m_Depth(0), m_Weight(1), m_Color(Color(255, 255, 255, 255)), m_DefaultColor(Color(255, 255, 255, 255)), m_FocusedColor(Color(128, 128, 128, 255))
+		: m_PosX(0.0f), m_PosY(0.0f), m_SizeX(1.0f), m_SizeY(1.0f), m_Depth(0), m_Weight(1), m_IsRoot(true), m_Color(Color(255, 255, 255, 255)), m_DefaultColor(Color(255, 255, 255, 255)), m_FocusedColor(Color(128, 128, 128, 255))
 	{
 	}
 

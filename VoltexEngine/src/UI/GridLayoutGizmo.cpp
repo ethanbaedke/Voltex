@@ -27,6 +27,7 @@ namespace VoltexEngine {
 			float ySize = vStep;
 			m_Children[hInd + (vInd * m_NumSlotsAcross)]->SetDimensions(xPos, yPos, xSize, ySize);
 			m_Children[hInd + (vInd * m_NumSlotsAcross)]->SetDepth(m_Depth + 1);
+			m_Children[hInd + (vInd * m_NumSlotsAcross)]->Tick();
 
 			hInd++;
 			if (hInd == m_NumSlotsAcross)

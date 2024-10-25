@@ -34,6 +34,9 @@ namespace VoltexEngine {
 
 	private:
 
+		/* Whether this gizmo is a top level gizmo or a child of a top level gizmo */
+		bool m_IsRoot;
+
 		Color m_Color;
 		Color m_DefaultColor;
 		Color m_FocusedColor;
@@ -53,14 +56,16 @@ namespace VoltexEngine {
 		inline int GetDepth() const { return m_Depth; }
 		inline void SetWeight(unsigned int weight) { m_Weight = weight; }
 		inline unsigned int GetWeight() const { return m_Weight; }
+		inline void SetIsRoot(bool isRoot) { m_IsRoot = isRoot; }
+		inline bool GetIsRoot() const { return m_IsRoot; }
 		inline const Color& GetColor() const { return m_Color; }
 
 		virtual std::string GetPrintable() const override;
 
-	private:
+	protected:
 
-		void HandleCursorEnter();
-		void HandleCursorLeave();
+		virtual void HandleCursorEnter();
+		virtual void HandleCursorLeave();
 
 	};
 

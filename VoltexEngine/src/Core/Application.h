@@ -22,7 +22,7 @@ namespace VoltexEngine {
 		std::vector<std::shared_ptr<GameObject>> m_UninitializedGameObjects;
 
 		/* Gizmos for UI rendering */
-		std::vector<std::shared_ptr<Gizmo>> m_Gizmos;
+		std::vector<std::shared_ptr<Gizmo>> m_RootGizmos;
 
 	public:
 
@@ -48,7 +48,7 @@ namespace VoltexEngine {
 		std::shared_ptr<T> CreateGizmo()
 		{
 			std::shared_ptr<T> giz = std::make_shared<T>();
-			m_Gizmos.push_back(giz);
+			m_RootGizmos.push_back(giz);
 			return giz;
 		}
 

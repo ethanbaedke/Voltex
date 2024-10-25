@@ -176,7 +176,7 @@ namespace VoltexEngine {
 		return true;
 	}
 
-	void Renderer::Tick(const std::vector<std::shared_ptr<GameObject>>& gameObjects, std::vector<std::shared_ptr<Gizmo>> gizmos)
+	void Renderer::Tick(const std::vector<std::shared_ptr<GameObject>>& gameObjects, std::vector<std::shared_ptr<Gizmo>> rootGizmos)
 	{
 		GLFWwindow* currentWindow = glfwGetCurrentContext();
 
@@ -196,7 +196,7 @@ namespace VoltexEngine {
 
 		RenderGameObjects(gameObjects);
 
-		RenderUI(gizmos);
+		RenderUI(rootGizmos);
 
 		glfwSwapBuffers(currentWindow);
 		glfwPollEvents();
@@ -500,13 +500,28 @@ namespace VoltexEngine {
 		}
 	}
 
-	void Renderer::RenderUI(std::vector<std::shared_ptr<Gizmo>> gizmos)
+	void Renderer::RenderUI(std::vector<std::shared_ptr<Gizmo>> rootGizmos)
 	{
 		// Draw the gizmo to the screen
 		glBindTexture(GL_TEXTURE_2D, s_DefaultUITextureID);
 
-		for (std::shared_ptr<Gizmo> giz : gizmos)
+		// Depth first render all gizmos, render as we go
+		std::vector<std::shared_ptr<Gizmo>> renderStack(rootGizmos);
+
+		while (renderStack.size() > 0)
 		{
+			// Pop the next gizmo off the top of the stack
+			std::shared_ptr<Gizmo> giz = renderStack.back();
+			renderStack.pop_back();
+
+			// If the current gizmo is a layout gizmo, get its children and add them to the render stack
+			if (std::shared_ptr<LayoutGizmo> layGiz = std::dynamic_pointer_cast<LayoutGizmo>(giz))
+			{
+				std::vector<std::shared_ptr<Gizmo>> children = layGiz->GetChildren();
+				for (std::shared_ptr<Gizmo> childGiz : children)
+					renderStack.push_back(childGiz);
+			}
+
 			float xP, yP, xS, yS;
 			giz->GetDimensions(&xP, &yP, &xS, &yS);
 

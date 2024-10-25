@@ -19,6 +19,7 @@ namespace VoltexEngine {
 			float sizeX = m_SizeX * (m_Children[i]->GetWeight() / totalWeight);
 			m_Children[i]->SetDimensions(currentX, m_PosY, sizeX, m_SizeY);
 			m_Children[i]->SetDepth(m_Depth + 1);
+			m_Children[i]->Tick();
 			currentX += sizeX;
 		}
 	}

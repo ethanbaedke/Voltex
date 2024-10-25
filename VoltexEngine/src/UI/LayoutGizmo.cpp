@@ -3,6 +3,10 @@
 
 namespace VoltexEngine {
 
-
+    void LayoutGizmo::AddChild(std::shared_ptr<Gizmo> gizmo)
+    {
+        m_Children.push_back(gizmo);
+        gizmo->SetIsRoot(false);
+    }
 
 }

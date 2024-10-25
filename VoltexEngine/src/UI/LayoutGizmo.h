@@ -15,7 +15,8 @@ namespace VoltexEngine {
 
 	public:
 
-		inline void AddChild(std::shared_ptr<Gizmo> gizmo) { m_Children.push_back(gizmo); }
+		void AddChild(std::shared_ptr<Gizmo> gizmo);
+
 		inline const std::vector<std::shared_ptr<Gizmo>>& GetChildren() { return m_Children; }
 
 	};
