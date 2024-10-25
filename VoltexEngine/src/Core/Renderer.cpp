@@ -445,6 +445,10 @@ namespace VoltexEngine {
 
 	void Renderer::RenderGameObjects(const std::vector<std::shared_ptr<GameObject>>& gameObjects)
 	{
+		// Set the color on the fragment to white with full transparency
+		GLint fragmentColor = glGetUniformLocation(s_ShaderProgram, "color");
+		glUniform4f(fragmentColor, 1.0f, 1.0f, 1.0f, 1.0f);
+
 		// The number of units visible on the screen horizontally
 		float zoomOut = 10.0f;
 
