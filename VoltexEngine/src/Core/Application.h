@@ -52,6 +52,10 @@ namespace VoltexEngine {
 			return giz;
 		}
 
+		/* Opens dialogues where the user can select a file or folder and returns the selected path */
+		const char* LoadFileDialog() const;
+		const char* SaveFileDialog() const;
+
 	};
 
 }

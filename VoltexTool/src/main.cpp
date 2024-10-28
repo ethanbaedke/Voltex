@@ -10,34 +10,33 @@ static std::shared_ptr<Sprite> BlockSprite;
 class RoomTile : public ButtonGizmo
 {
 	
-private:
+public:
 
-	bool m_Filled;
+	bool Filled;
 
 public:
 
 	RoomTile()
-		: m_Filled(false)
+		: Filled(false)
 	{
 		OnButtonPressed.AddCallback([&] { HandleButtonPressed(); });
 	}
 
-	inline bool GetFilled() const { return m_Filled; }
+	virtual void Tick() override
+	{
+		ButtonGizmo::Tick();
+
+		if (Filled)
+			UISprite = BlockSprite;
+		else
+			UISprite = nullptr;
+	}
 
 private:
 
 	void HandleButtonPressed()
 	{
-		if (!m_Filled)
-		{
-			UISprite = BlockSprite;
-			m_Filled = true;
-		}
-		else
-		{
-			UISprite = nullptr;
-			m_Filled = false;
-		}
+		Filled = !Filled;
 	}
 
 };
@@ -104,7 +103,7 @@ public:
 
 		// Load button
 		std::shared_ptr<ButtonGizmo> load = CreateGizmo<ButtonGizmo>();
-		load->OnButtonPressed.AddCallback([] { VX_LOG("Loading"); });
+		load->OnButtonPressed.AddCallback([&] { Load(); });
 		fileSelector->AddChild(load);
 	}
 
@@ -112,12 +111,17 @@ private:
 
 	void Save()
 	{
-		std::string fileLocation = "../VoltexGame/rooms/MyFirstRoom.bke";
-		std::ofstream file(fileLocation, std::ios::binary);
+		const char* filePath = SaveFileDialog();
+
+		// Return if the user cancelled a file selection
+		if (!filePath)
+			return;
+
+		std::ofstream file(filePath, std::ios::binary);
 
 		if (!file)
 		{
-			VX_ERROR("Could not write to location: " + fileLocation);
+			VX_ERROR("Could not write to location: " + filePath);
 			return;
 		}
 
@@ -131,7 +135,7 @@ private:
 		{
 			if (std::shared_ptr<RoomTile> tile = std::static_pointer_cast<RoomTile>(giz))
 			{
-				if (tile->GetFilled())
+				if (tile->Filled)
 				{
 					char byte = 0x01;
 					file.write(reinterpret_cast<const char*>(&byte), sizeof(byte));
@@ -145,7 +149,53 @@ private:
 		}
 
 		file.close();
-		VX_LOG("Saved room to: " + fileLocation);
+		VX_LOG("Saved room to: " + filePath);
+	}
+
+	void Load()
+	{
+		const char* filePath = LoadFileDialog();
+
+		// Return if the user cancelled a file selection
+		if (!filePath)
+			return;
+
+		std::ifstream file(filePath, std::ios::binary);
+
+		if (!file)
+		{
+			VX_ERROR("Could not write to location: " + filePath);
+			return;
+		}
+
+		// The first two pieces of data are integers for the width of the room, followed by the height of the room
+		int width, height;
+		file.read(reinterpret_cast<char*>(&width), sizeof(width));
+		file.read(reinterpret_cast<char*>(&height), sizeof(height));
+
+		if (width != ROOM_WIDTH || height != ROOM_HEIGHT)
+		{
+			VX_ERROR("Room dimensions did not match expected dimensions. This room may have been made with an older version of the VoltexTool.");
+			return;
+		}
+
+		// Read the file byte by byte and fill in RoomTiles where necessary
+		std::vector<std::shared_ptr<Gizmo>> tiles = m_RoomEditor->GetChildren();
+		for (std::shared_ptr<Gizmo> giz : tiles)
+		{
+			if (std::shared_ptr<RoomTile> tile = std::static_pointer_cast<RoomTile>(giz))
+			{
+				char byte;
+				file.read(reinterpret_cast<char*>(&byte), sizeof(byte));
+				if (byte == 0x00)
+					tile->Filled = false;
+				else if (byte == 0x01)
+					tile->Filled = true;
+			}
+		}
+
+		file.close();
+		VX_LOG("Loaded room from file: " + filePath);
 	}
 
 };

@@ -5,6 +5,7 @@
 #include "Console.h"
 #include "Vector.h"
 #include "Input.h"
+#include "tinyfiledialogs.h"
 
 #include <chrono>
 
@@ -124,6 +125,18 @@ namespace VoltexEngine {
 
 		std::shared_ptr<Sprite> spr = std::make_shared<Sprite>(width, height, textureID);
 		return spr;
+	}
+
+	const char* Application::LoadFileDialog() const
+	{
+		const char* filter[] = { "*.bke" };
+		return tinyfd_openFileDialog("Select a Room File", "../VoltexGame/rooms", 1, filter, "BKE File", 0);
+	}
+
+	const char* Application::SaveFileDialog() const
+	{
+		const char* filter[] = {"*.bke"};
+		return tinyfd_saveFileDialog("Save File As", "../VoltexGame/rooms/NewRoom.bke", 1, filter, "BKE File");
 	}
 
 }

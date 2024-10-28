@@ -16,7 +16,7 @@ public:
 		std::shared_ptr<Sprite> presentSprite = CreateSprite("textures/Present.png");
 		std::shared_ptr<Sprite> crateSprite = CreateSprite("textures/Crate.png");
 
-		std::string filePath = "rooms/MyFirstRoom.bke";
+		std::string filePath = "rooms/BasicAcross.bke";
 		std::ifstream file(filePath, std::ios::binary);
 
 		if (!file)
