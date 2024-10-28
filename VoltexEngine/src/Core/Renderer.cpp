@@ -459,19 +459,19 @@ namespace VoltexEngine {
 		// The game objects passed into this function have already been filtered, no need to check for expiration
 		for (std::shared_ptr<GameObject> obj : gameObjects)
 		{
-			if (std::shared_ptr<Sprite> spr = obj->GetSprite())
+			if (std::shared_ptr<Sprite> spr = obj->Sprite)
 			{
 				// Bind the texture for this sprite
 				glBindTexture(GL_TEXTURE_2D, spr->GetTextureID());
 
 				// Get the position, scale, and rotation of the game object
-				Vector position = obj->GetPosition();
-				float radianAngle = glm::radians(obj->GetRotation());
-				int depth = obj->GetDepth();
+				Vector position = obj->Position;
+				float radianAngle = glm::radians(obj->Angle);
+				int depth = obj->Depth;
 
 				// Create and bind the model matrix
 				glm::mat4 modelMatrix = glm::mat4(1.0f);
-				modelMatrix = glm::translate(modelMatrix, glm::vec3(position.X(), position.Y(), depth));
+				modelMatrix = glm::translate(modelMatrix, glm::vec3(position.X, position.Y, depth));
 				modelMatrix = glm::rotate(modelMatrix, radianAngle, glm::vec3(0.0f, 0.0f, 1.0f));
 				modelMatrix = glm::scale(modelMatrix, glm::vec3((float)spr->GetWidth() / PPU, (float)spr->GetHeight() / PPU, 0.0f));
 				GLint vertexModelMatrix = glGetUniformLocation(s_ShaderProgram, "modelMatrix");
@@ -528,11 +528,11 @@ namespace VoltexEngine {
 			// Set the UI color on the fragment shader
 			Color uiColor = giz->GetColor();
 			GLint fragmentColor = glGetUniformLocation(s_ShaderProgram, "color");
-			glUniform4f(fragmentColor, uiColor.R() / 255.0f, uiColor.G() / 255.0f, uiColor.B() / 255.0f, uiColor.A() / 255.0f);
+			glUniform4f(fragmentColor, uiColor.R / 255.0f, uiColor.G / 255.0f, uiColor.B / 255.0f, uiColor.A / 255.0f);
 
 			// Create and bind the model matrix
 			glm::mat4 modelMatrix = glm::mat4(1.0f);
-			modelMatrix = glm::translate(modelMatrix, glm::vec3((2.0f * xP) + xS - 1.0f, (2.0f * yP) + yS - 1.0f, giz->GetDepth()));
+			modelMatrix = glm::translate(modelMatrix, glm::vec3((2.0f * xP) + xS - 1.0f, (2.0f * yP) + yS - 1.0f, giz->Depth));
 			modelMatrix = glm::scale(modelMatrix, glm::vec3(xS * 2.0f, yS * 2.0f, 1.0f));
 			GLint vertexModelMatrix = glGetUniformLocation(s_ShaderProgram, "modelMatrix");
 			glUniformMatrix4fv(vertexModelMatrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));

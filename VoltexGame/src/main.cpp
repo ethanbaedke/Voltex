@@ -1,4 +1,4 @@
-#include <VoltexEngine.h>
+#include <VECore.h>
 #include <random>
 
 using namespace VoltexEngine;
@@ -36,11 +36,8 @@ public:
 		float randomX = (float)dis(gen);
 		float randomY = (float)dis(gen);
 
-		// Here we create a vector holding the random x and y values we generated
-		Vector randomPosition(randomX, randomY);
-
-		// We call the SetPosition function on our game object, passing in the vector we just made
-		SetPosition(randomPosition);
+		// Here we set the position of our game object using our randomly generated x and y values
+		Position = Vector(randomX, randomY);
 
 		// Lets store our initial position so we can do some fun things with it in the Update function
 		m_InitialX = randomX;
@@ -54,9 +51,8 @@ public:
 
 		// Lets have our object bounce back and fourth on the x-axis
 		m_TimeElapsed += deltaTime;
-		Vector currentPosition = GetPosition();
-		Vector newPosition(m_InitialX + sin(m_TimeElapsed * m_BounceSpeed), currentPosition.Y());
-		SetPosition(newPosition);
+		Vector newPosition(m_InitialX + sin(m_TimeElapsed * m_BounceSpeed), Position.Y);
+		Position = newPosition;
 	}
 
 };
@@ -101,9 +97,8 @@ public:
 
 		// Here we calculate our y-direction based on our inputs and move in that direction by our specified speed
 		m_YDir = m_UpHeld - m_DownHeld;
-		Vector currentPosition = GetPosition();
-		Vector newPosition = Vector(currentPosition.X(), currentPosition.Y() + (m_YDir * m_Speed * deltaTime));
-		SetPosition(newPosition);
+		Vector newPosition = Vector(Position.X, Position.Y + (m_YDir * m_Speed * deltaTime));
+		Position = newPosition;
 	}
 };
 
@@ -122,18 +117,18 @@ public:
 
 		// Here we create some instances of our custom game objects
 		std::shared_ptr<BounceObject> barrel = CreateObject<BounceObject>();
-		barrel->SetSprite(barrelSprite);
+		barrel->Sprite = barrelSprite;
 
 		std::shared_ptr<BounceObject> present = CreateObject<BounceObject>();
-		present->SetSprite(presentSprite);
+		present->Sprite = presentSprite;
 
 		std::shared_ptr<MoveObject> crate = CreateObject<MoveObject>();
-		crate->SetSprite(crateSprite);
+		crate->Sprite = crateSprite;
 
 		// Here we tell our objects to render in front or behind each other
-		present->SetDepth(1);
-		barrel->SetDepth(0);
-		crate->SetDepth(-1);
+		present->Depth = 1;
+		barrel->Depth = 0;
+		crate->Depth = -1;
 	}
 
 };

@@ -37,7 +37,7 @@ namespace VoltexEngine {
 			i = 0;
 			while (i < m_RootGizmos.size())
 			{
-				if (!m_RootGizmos[i]->GetIsRoot())
+				if (!m_RootGizmos[i]->IsRoot)
 					m_RootGizmos.erase(m_RootGizmos.begin() + i);
 				else
 					i++;
@@ -69,7 +69,7 @@ namespace VoltexEngine {
 					}
 
 					// If our current gizmo is at a lower depth than our hit gizmo, ignore it
-					if (hit && giz->GetDepth() < hit->GetDepth())
+					if (hit && giz->Depth < hit->Depth)
 						continue;
 
 					// Check if the cursor overlaps the gizmo

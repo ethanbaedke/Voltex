@@ -6,43 +6,43 @@
 namespace VoltexEngine {
 
 	Vector::Vector()
-		: m_X(0.0f), m_Y(0.0f)
+		: X(0.0f), Y(0.0f)
 	{
 	}
 
 	Vector::Vector(float units)
-		: m_X(units), m_Y(units)
+		: X(units), Y(units)
 	{
 	}
 
 	Vector::Vector(float x, float y)
-		: m_X(x), m_Y(y)
+		: X(x), Y(y)
 	{
 	}
 	
 	float Vector::Length() const
 	{
-		return (float)sqrt((m_X * m_X) + (m_Y * m_Y));
+		return (float)sqrt((X * X) + (Y * Y));
 	}
 
 	float Vector::Dot(const Vector& other) const
 	{
-		return (m_X * other.m_X) + (m_Y * other.m_Y);
+		return (X * other.X) + (Y * other.Y);
 	}
 
 	Vector Vector::operator+(const Vector& other) const
 	{
-		return Vector(m_X + other.m_X, m_Y + other.m_Y);
+		return Vector(X + other.X, Y + other.Y);
 	}
 
 	Vector Vector::operator-(const Vector& other) const
 	{
-		return Vector(m_X - other.m_X, m_Y - other.m_Y);
+		return Vector(X - other.X, Y - other.Y);
 	}
 
 	Vector Vector::operator*(float scalar) const
 	{
-		return Vector(m_X * scalar, m_Y * scalar);
+		return Vector(X * scalar, Y * scalar);
 	}
 
 	Vector Vector::operator/(float divisor) const
@@ -53,12 +53,12 @@ namespace VoltexEngine {
 			return Vector();
 		}
 
-		return Vector(m_X / divisor, m_Y / divisor);
+		return Vector(X / divisor, Y / divisor);
 	}
 
 	std::string Vector::GetPrintable() const
 	{
-		return "(" + std::to_string(m_X) + ", " + std::to_string(m_Y) + ")";
+		return "(" + std::to_string(X) + ", " + std::to_string(Y) + ")";
 	}
 
 }

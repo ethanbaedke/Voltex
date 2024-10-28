@@ -105,8 +105,10 @@ namespace VoltexEngine {
 		/* Add an input to the queue of a certain input code */
 		static inline void EnqueueKey(KeyCode code, DiscreteType type) { s_DiscreteInputs[static_cast<int>(code)].push_back(type); }
 		static inline void EnqueueClick(ClickCode code, DiscreteType type) { s_DiscreteInputs[static_cast<int>(code) + NUM_KEY_CODES].push_back(type); }
-		static inline void GetCursorPosition(float* outXPos, float* outYPos) { *outXPos = s_CursorX; *outYPos = s_CursorY; }
+		
+		/* Set/Get the cursor position */
 		static inline void SetCursorPosition(float xPos, float yPos) { s_CursorXIntermediary = xPos; s_CursorYIntermediary = yPos; }
+		static inline void GetCursorPosition(float* outXPos, float* outYPos) { *outXPos = s_CursorX; *outYPos = s_CursorY; }
 
 	};
 

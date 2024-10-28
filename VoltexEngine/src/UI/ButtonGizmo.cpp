@@ -13,7 +13,7 @@ namespace VoltexEngine {
 		Gizmo::SetColor(color);
 		
 		m_DefaultColor = color;
-		m_FocusedColor = Color(color.R() / 2, color.G() / 2, color.B() / 2, color.A());
+		m_FocusedColor = Color(color.R / 2, color.G / 2, color.B / 2, color.A);
 	}
 
 	void ButtonGizmo::HandleCursorEnter()

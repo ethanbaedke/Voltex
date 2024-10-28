@@ -1,4 +1,5 @@
-#include <VoltexEngine.h>
+#include <VECore.h>
+#include <VEUI.h>
 
 using namespace VoltexEngine;
 
@@ -21,12 +22,12 @@ public:
 		}
 
 		std::shared_ptr<VerticalLayoutGizmo> vertLayout = CreateGizmo<VerticalLayoutGizmo>();
-		vertLayout->SetWeight(15);
+		vertLayout->Weight = 15;
 		canvas->AddChild(vertLayout);
 
 		std::shared_ptr<GridLayoutGizmo> roomEditor = CreateGizmo<GridLayoutGizmo>();
 		roomEditor->SetNumSlots(20, 10);
-		roomEditor->SetWeight(3);
+		roomEditor->Weight = 3;
 		vertLayout->AddChild(roomEditor);
 
 		for (int i = 0; i < 20 * 10; i++)

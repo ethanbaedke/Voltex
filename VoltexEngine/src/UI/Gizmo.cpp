@@ -28,7 +28,7 @@ namespace VoltexEngine {
 	}
 
 	Gizmo::Gizmo()
-		: m_PosX(0.0f), m_PosY(0.0f), m_SizeX(1.0f), m_SizeY(1.0f), m_Depth(0), m_Weight(1), m_IsRoot(true), m_Color(Color(255, 255, 255, 255))
+		: Weight(1), Depth(0), IsRoot(true), m_PosX(0.0f), m_PosY(0.0f), m_SizeX(1.0f), m_SizeY(1.0f), m_Color(Color(255, 255, 255, 255))
 	{
 	}
 
@@ -52,7 +52,7 @@ namespace VoltexEngine {
 	{
 		std::string position = "Position: (" + std::to_string(m_PosX) + ", " + std::to_string(m_PosY) + ") ";
 		std::string size = "Size: (" + std::to_string(m_SizeX) + ", " + std::to_string(m_SizeY) + ") ";
-		std::string depth = "Depth: (" + std::to_string(m_Depth) + ") ";
+		std::string depth = "m_Depth: (" + std::to_string(Depth) + ") ";
 		return position + size + depth;
 	}
 
