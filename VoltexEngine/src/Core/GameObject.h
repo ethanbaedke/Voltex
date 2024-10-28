@@ -26,7 +26,7 @@ namespace VoltexEngine {
 		/* Objects with a lower depth will be rendered behind objects with a higher depth */
 		int Depth;
 
-		std::shared_ptr<Sprite> Sprite;
+		std::shared_ptr<Sprite> ObjectSprite;
 
 	public:
 

@@ -28,7 +28,7 @@ namespace VoltexEngine {
 	}
 
 	Gizmo::Gizmo()
-		: Weight(1), Depth(0), IsRoot(true), m_PosX(0.0f), m_PosY(0.0f), m_SizeX(1.0f), m_SizeY(1.0f), m_Color(Color(255, 255, 255, 255))
+		: UISprite(nullptr), Weight(1), Depth(0), IsRoot(true), m_PosX(0.0f), m_PosY(0.0f), m_SizeX(1.0f), m_SizeY(1.0f), m_Color(Color(255, 255, 255, 255))
 	{
 	}
 

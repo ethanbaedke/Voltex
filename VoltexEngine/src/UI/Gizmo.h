@@ -3,6 +3,7 @@
 
 #include "Core/Printable.h"
 #include "Core/Color.h"
+#include "Core/Sprite.h"
 
 namespace VoltexEngine {
 
@@ -20,6 +21,8 @@ namespace VoltexEngine {
 		static void CursorSelect();
 
 	public:
+
+		std::shared_ptr<Sprite> UISprite;
 
 		/* How much space this element should take up relative to its siblings if in a weighted layout */
 		unsigned int Weight;

@@ -450,7 +450,7 @@ namespace VoltexEngine {
 		glUniform4f(fragmentColor, 1.0f, 1.0f, 1.0f, 1.0f);
 
 		// The number of units visible on the screen horizontally
-		float zoomOut = 10.0f;
+		float zoomOut = 40.0f;
 
 		// Calculated from the center of the screen to the bounds
 		float unitsX = zoomOut / 2.0f;
@@ -459,7 +459,7 @@ namespace VoltexEngine {
 		// The game objects passed into this function have already been filtered, no need to check for expiration
 		for (std::shared_ptr<GameObject> obj : gameObjects)
 		{
-			if (std::shared_ptr<Sprite> spr = obj->Sprite)
+			if (std::shared_ptr<Sprite> spr = obj->ObjectSprite)
 			{
 				// Bind the texture for this sprite
 				glBindTexture(GL_TEXTURE_2D, spr->GetTextureID());
@@ -478,16 +478,12 @@ namespace VoltexEngine {
 				glUniformMatrix4fv(vertexModelMatrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 
 				// Create and bind the view matrix
-				glm::mat4 viewMatrix = glm::lookAt(
-					glm::vec3(0.0f, 0.0f, 5.0f),
-					glm::vec3(0.0f, 0.0f, 0.0f),
-					glm::vec3(0.0f, 1.0f, 0.0f)
-				);
+				glm::mat4 viewMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-unitsX + 0.5f, unitsY - 0.5f, 0.0f));
 				GLint vertexViewMatrix = glGetUniformLocation(s_ShaderProgram, "viewMatrix");
 				glUniformMatrix4fv(vertexViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 
 				// Create and bind the projection matrix
-				glm::mat4 projectionMatrix = glm::ortho(-unitsX, unitsX, -unitsY, unitsY, 1.0f, 10.0f);
+				glm::mat4 projectionMatrix = glm::ortho(-unitsX, unitsX, -unitsY, unitsY);
 				GLint vertexProjectionMatrix = glGetUniformLocation(s_ShaderProgram, "projectionMatrix");
 				glUniformMatrix4fv(vertexProjectionMatrix, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 
@@ -502,9 +498,6 @@ namespace VoltexEngine {
 
 	void Renderer::RenderUI(std::vector<std::shared_ptr<Gizmo>> rootGizmos)
 	{
-		// Draw the gizmo to the screen
-		glBindTexture(GL_TEXTURE_2D, s_DefaultUITextureID);
-
 		// Depth first render all gizmos, render as we go
 		std::vector<std::shared_ptr<Gizmo>> renderStack(rootGizmos);
 
@@ -513,6 +506,12 @@ namespace VoltexEngine {
 			// Pop the next gizmo off the top of the stack
 			std::shared_ptr<Gizmo> giz = renderStack.back();
 			renderStack.pop_back();
+
+			// Set the texture for this gizmo
+			if (giz->UISprite)
+				glBindTexture(GL_TEXTURE_2D, giz->UISprite->GetTextureID());
+			else
+				glBindTexture(GL_TEXTURE_2D, s_DefaultUITextureID);
 
 			// If the current gizmo is a layout gizmo, get its children and add them to the render stack
 			if (std::shared_ptr<LayoutGizmo> layGiz = std::dynamic_pointer_cast<LayoutGizmo>(giz))
