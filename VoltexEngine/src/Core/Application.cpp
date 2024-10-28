@@ -80,6 +80,9 @@ namespace VoltexEngine {
 				}
 
 				Gizmo::CursorOverlap(hit);
+
+				if (Input::MouseDown(ClickCode::LeftMouse))
+					Gizmo::CursorSelect();
 			}
 
 			// Initialize any uninitialized game objects

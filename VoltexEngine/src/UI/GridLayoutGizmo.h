@@ -19,6 +19,8 @@ namespace VoltexEngine {
 
 		virtual void Tick() override;
 
+		void SetNumSlots(int across, int down);
+
 	};
 
 }

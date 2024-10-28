@@ -38,4 +38,10 @@ namespace VoltexEngine {
 		}
 	}
 
+	void GridLayoutGizmo::SetNumSlots(int across, int down)
+	{
+		m_NumSlotsAcross = across;
+		m_NumSlotsDown = down;
+	}
+
 }

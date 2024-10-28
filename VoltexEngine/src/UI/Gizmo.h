@@ -17,6 +17,7 @@ namespace VoltexEngine {
 	public:
 
 		static void CursorOverlap(std::shared_ptr<Gizmo> gizmo);
+		static void CursorSelect();
 
 	protected:
 
@@ -32,14 +33,13 @@ namespace VoltexEngine {
 		/* How much space this element should take up relative to its siblings if in a weighted layout */
 		unsigned int m_Weight;
 
+		/* Color of the gizmo */
+		Color m_Color;
+
 	private:
 
 		/* Whether this gizmo is a top level gizmo or a child of a top level gizmo */
 		bool m_IsRoot;
-
-		Color m_Color;
-		Color m_DefaultColor;
-		Color m_FocusedColor;
 
 	public:
 
@@ -49,8 +49,6 @@ namespace VoltexEngine {
 
 		void SetDimensions(float xPos, float yPos, float xSize, float ySize);
 		void GetDimensions(float* outXPos, float* outYPos, float* outXSize, float* outYSize) const;
-
-		void SetColor(const Color& color);
 
 		inline void SetDepth(int depth) { m_Depth = depth; }
 		inline int GetDepth() const { return m_Depth; }
@@ -64,8 +62,11 @@ namespace VoltexEngine {
 
 	protected:
 
-		virtual void HandleCursorEnter();
-		virtual void HandleCursorLeave();
+		virtual void SetColor(const Color& color) { m_Color = color; }
+
+		virtual void HandleCursorEnter() {};
+		virtual void HandleCursorLeave() {};
+		virtual void HandleCursorSelect() {};
 
 	};
 
