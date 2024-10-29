@@ -125,7 +125,7 @@ project "VoltexGame"
     {
         "VoltexGame/src/**.h",
         "VoltexGame/src/**.cpp",
-        "VoltexGame/textures/*.png",
+        "VoltexGame/textures/**.png",
         "VoltexGame/rooms/**.bke"
     }
 

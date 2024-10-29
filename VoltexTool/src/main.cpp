@@ -5,19 +5,19 @@
 
 using namespace VoltexEngine;
 
-static std::shared_ptr<Sprite> BlockSprite;
+static std::vector<std::shared_ptr<Sprite>> TileSprites;
 
 class RoomTile : public ButtonGizmo
 {
 	
 public:
 
-	bool Filled;
+	unsigned char TileIndex;
 
 public:
 
 	RoomTile()
-		: Filled(false)
+		: TileIndex(0)
 	{
 		OnButtonPressed.AddCallback([&] { HandleButtonPressed(); });
 	}
@@ -26,17 +26,17 @@ public:
 	{
 		ButtonGizmo::Tick();
 
-		if (Filled)
-			UISprite = BlockSprite;
-		else
-			UISprite = nullptr;
+		UISprite = TileSprites[TileIndex];
 	}
 
 private:
 
 	void HandleButtonPressed()
 	{
-		Filled = !Filled;
+		if (TileIndex < TileSprites.size() - 1)
+			TileIndex++;
+		else
+			TileIndex = 0;
 	}
 
 };
@@ -58,7 +58,9 @@ public:
 	Tool()
 		: m_RoomEditor(nullptr)
 	{
-		BlockSprite = CreateSprite("textures/Block.png");
+		TileSprites.push_back(nullptr);
+		TileSprites.push_back(CreateSprite("../VoltexGame/textures/tiles/DirtBlock.png"));
+		TileSprites.push_back(CreateSprite("../VoltexGame/textures/tiles/StoneBlock.png"));
 
 		// Make the base gizmo that will hold all other gizmos
 		std::shared_ptr<HorizontalLayoutGizmo> canvas = CreateGizmo<HorizontalLayoutGizmo>();
@@ -129,24 +131,11 @@ private:
 		file.write(reinterpret_cast<const char*>(&ROOM_WIDTH), sizeof(ROOM_WIDTH));
 		file.write(reinterpret_cast<const char*>(&ROOM_HEIGHT), sizeof(ROOM_HEIGHT));
 
-		// Save the room as a straight shot of bytes representing whether there is a solid block or not
+		// Save the RoomTiles indices as bytes in the room file
 		std::vector<std::shared_ptr<Gizmo>> tiles = m_RoomEditor->GetChildren();	
 		for (std::shared_ptr<Gizmo> giz : tiles)
-		{
 			if (std::shared_ptr<RoomTile> tile = std::static_pointer_cast<RoomTile>(giz))
-			{
-				if (tile->Filled)
-				{
-					char byte = 0x01;
-					file.write(reinterpret_cast<const char*>(&byte), sizeof(byte));
-				}
-				else
-				{
-					char byte = 0x00;
-					file.write(reinterpret_cast<const char*>(&byte), sizeof(byte));
-				}
-			}
-		}
+				file.write(reinterpret_cast<const char*>(&(tile->TileIndex)), sizeof(unsigned char));
 
 		file.close();
 		VX_LOG("Saved room to: " + filePath);
@@ -179,20 +168,11 @@ private:
 			return;
 		}
 
-		// Read the file byte by byte and fill in RoomTiles where necessary
+		// Read the bytes of the file into the indices of the RoomTiles
 		std::vector<std::shared_ptr<Gizmo>> tiles = m_RoomEditor->GetChildren();
 		for (std::shared_ptr<Gizmo> giz : tiles)
-		{
 			if (std::shared_ptr<RoomTile> tile = std::static_pointer_cast<RoomTile>(giz))
-			{
-				char byte;
-				file.read(reinterpret_cast<char*>(&byte), sizeof(byte));
-				if (byte == 0x00)
-					tile->Filled = false;
-				else if (byte == 0x01)
-					tile->Filled = true;
-			}
-		}
+				file.read(reinterpret_cast<char*>(&(tile->TileIndex)), sizeof(unsigned char));
 
 		file.close();
 		VX_LOG("Loaded room from file: " + filePath);

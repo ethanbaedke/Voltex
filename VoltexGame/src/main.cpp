@@ -4,6 +4,8 @@
 
 using namespace VoltexEngine;
 
+static std::vector<std::shared_ptr<Sprite>> TileSprites;
+
 /* Lets create a class from the Application class, which handels creating and updating a window */
 class Game : public Application
 {
@@ -12,11 +14,11 @@ public:
 
 	Game()
 	{
-		std::shared_ptr<Sprite> barrelSprite = CreateSprite("textures/Barrel.png");
-		std::shared_ptr<Sprite> presentSprite = CreateSprite("textures/Present.png");
-		std::shared_ptr<Sprite> crateSprite = CreateSprite("textures/Crate.png");
+		TileSprites.push_back(nullptr);
+		TileSprites.push_back(CreateSprite("../VoltexGame/textures/tiles/DirtBlock.png"));
+		TileSprites.push_back(CreateSprite("../VoltexGame/textures/tiles/StoneBlock.png"));
 
-		std::string filePath = "rooms/BasicAcross.bke";
+		std::string filePath = "rooms/StoneBasicAcross.bke";
 		std::ifstream file(filePath, std::ios::binary);
 
 		if (!file)
@@ -35,15 +37,16 @@ public:
 		{
 			for (int x = 0; x < width; x++)
 			{
-				char byte;
+				unsigned char byte;
 				file.read(reinterpret_cast<char*>(&byte), sizeof(byte));
-				if (byte == 0x01)
-				{
-					std::shared_ptr<GameObject> obj = CreateObject<GameObject>();
-					obj->ObjectSprite = barrelSprite;
-					obj->Position.X = x;
-					obj->Position.Y = -y;
-				}
+
+				if (byte == 0x00)
+					continue;
+
+				std::shared_ptr<GameObject> obj = CreateObject<GameObject>();
+				obj->ObjectSprite = TileSprites[byte];
+				obj->Position.X = x;
+				obj->Position.Y = -y;
 			}
 		}
 
