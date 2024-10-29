@@ -1,6 +1,6 @@
 # Voltex
-The Voltex Engine is a tool used to rapdily prototype 2D platforming levels
-Currently, the Voltex Engine only supports Windows(x64) and build settings are only set for Visual Studio
+The Voltex Engine is a tool used to rapdily prototype 2D platforming levels  
+Currently, the Voltex Engine only supports Windows(x64) and build settings are only set for Visual Studio  
 
 # Build Instructions
 1) Download and unzip the repository on your Window(x64) machine
