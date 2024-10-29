@@ -450,7 +450,7 @@ namespace VoltexEngine {
 		glUniform4f(fragmentColor, 1.0f, 1.0f, 1.0f, 1.0f);
 
 		// The number of units visible on the screen horizontally
-		float zoomOut = 40.0f;
+		float zoomOut = 42.0f;
 
 		// Calculated from the center of the screen to the bounds
 		float unitsX = zoomOut / 2.0f;
@@ -478,7 +478,7 @@ namespace VoltexEngine {
 				glUniformMatrix4fv(vertexModelMatrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 
 				// Create and bind the view matrix
-				glm::mat4 viewMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-unitsX + 0.5f, unitsY - 0.5f, 0.0f));
+				glm::mat4 viewMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-unitsX + 1.5f, unitsY - 1.5f, 0.0f));
 				GLint vertexViewMatrix = glGetUniformLocation(s_ShaderProgram, "viewMatrix");
 				glUniformMatrix4fv(vertexViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 

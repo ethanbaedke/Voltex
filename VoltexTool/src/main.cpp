@@ -60,7 +60,6 @@ public:
 	{
 		TileSprites.push_back(nullptr);
 		TileSprites.push_back(CreateSprite("../VoltexGame/textures/tiles/DirtBlock.png"));
-		TileSprites.push_back(CreateSprite("../VoltexGame/textures/tiles/StoneBlock.png"));
 
 		// Make the base gizmo that will hold all other gizmos
 		std::shared_ptr<HorizontalLayoutGizmo> canvas = CreateGizmo<HorizontalLayoutGizmo>();
@@ -127,10 +126,6 @@ private:
 			return;
 		}
 
-		// The first two pieces of data are integers for the width of the room, followed by the height of the room
-		file.write(reinterpret_cast<const char*>(&ROOM_WIDTH), sizeof(ROOM_WIDTH));
-		file.write(reinterpret_cast<const char*>(&ROOM_HEIGHT), sizeof(ROOM_HEIGHT));
-
 		// Save the RoomTiles indices as bytes in the room file
 		std::vector<std::shared_ptr<Gizmo>> tiles = m_RoomEditor->GetChildren();	
 		for (std::shared_ptr<Gizmo> giz : tiles)
@@ -154,17 +149,6 @@ private:
 		if (!file)
 		{
 			VX_ERROR("Could not write to location: " + filePath);
-			return;
-		}
-
-		// The first two pieces of data are integers for the width of the room, followed by the height of the room
-		int width, height;
-		file.read(reinterpret_cast<char*>(&width), sizeof(width));
-		file.read(reinterpret_cast<char*>(&height), sizeof(height));
-
-		if (width != ROOM_WIDTH || height != ROOM_HEIGHT)
-		{
-			VX_ERROR("Room dimensions did not match expected dimensions. This room may have been made with an older version of the VoltexTool.");
 			return;
 		}
 

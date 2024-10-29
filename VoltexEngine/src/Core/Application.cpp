@@ -11,6 +11,8 @@
 
 namespace VoltexEngine {
 
+	Application* Application::Current;
+
 	Application::Application()
 		: m_GameObjects(std::vector<std::shared_ptr<GameObject>>()), m_UninitializedGameObjects(std::vector<std::shared_ptr<GameObject>>())
 	{
@@ -19,6 +21,8 @@ namespace VoltexEngine {
 
 		if (!Renderer::Init(1280, 720))
 			return;
+
+		Current = this;
 
 		VX_LOG("Application Initialized");
 	}

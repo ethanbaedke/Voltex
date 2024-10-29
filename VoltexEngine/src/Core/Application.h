@@ -13,6 +13,10 @@ namespace VoltexEngine {
 	class Application
 	{
 
+	public:
+
+		static Application* Current;
+
 	private:
 
 		/* All initialized game objects tracked by this application */
