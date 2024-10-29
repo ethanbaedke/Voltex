@@ -1,5 +1,6 @@
 workspace "Voltex"
     architecture "x64"
+    cppdialect "C++17"
 
     configurations 
     {

@@ -1,17 +1,33 @@
 #include "Level.h"
 
 #include <fstream>
-#include <random>
 
+bool Level::s_LevelDataInitialized = false;
 std::vector<std::shared_ptr<Sprite>> Level::s_TileSprites;
+std::vector<std::filesystem::path> Level::s_StandardPaths;
+std::vector<std::filesystem::path> Level::s_DropPaths;
+std::vector<std::filesystem::path> Level::s_CatchPaths;
+std::mt19937 Level::randomGenerator;
 
 Level::Level(const Vector& position, const Vector& size)
 {
-	// If we haven't already, load our sprites
-	if (s_TileSprites.size() == 0)
+	// The first time we create a level, initialize data levels rely on like sprites and room file paths
+	if (!s_LevelDataInitialized)
 	{
 		s_TileSprites.push_back(nullptr);
 		s_TileSprites.push_back(Application::Current->CreateSprite("../VoltexGame/textures/tiles/DirtBlock.png"));
+
+		for (const auto& entry : std::filesystem::directory_iterator("rooms/standard"))
+			s_StandardPaths.push_back(entry.path());
+		for (const auto& entry : std::filesystem::directory_iterator("rooms/drop"))
+			s_DropPaths.push_back(entry.path());
+		for (const auto& entry : std::filesystem::directory_iterator("rooms/catch"))
+			s_CatchPaths.push_back(entry.path());
+
+		std::random_device rd;
+		randomGenerator = std::mt19937(rd());
+
+		s_LevelDataInitialized = true;
 	}
 
 	int xOffset = position.X;
@@ -50,7 +66,8 @@ Level::Level(const Vector& position, const Vector& size)
 	{
 		for (int levelX = 0; levelX < size.X; levelX++)
 		{
-			std::string filePath = "rooms/BasicAcross.bke";
+			std::uniform_int_distribution<> distr(0, s_StandardPaths.size() - 1);
+			std::string filePath = s_StandardPaths[distr(randomGenerator)].string();
 			std::ifstream file(filePath, std::ios::binary);
 
 			if (!file)
