@@ -5,6 +5,8 @@
 #include "Console.h"
 #include "Vector.h"
 #include "Input.h"
+#include "UI/LayoutGizmo.h"
+#include "UI/TextGizmo.h"
 #include "tinyfiledialogs.h"
 
 #include <chrono>
@@ -71,6 +73,11 @@ namespace VoltexEngine {
 						std::vector<std::shared_ptr<Gizmo>> children = layGiz->GetChildren();
 						for (std::shared_ptr<Gizmo> childGiz : children)
 							collisionStack.push_back(childGiz);
+					}
+					// Otherwise, if the current gizmo is a text gizmo, skip checking for overlap with it
+					else if (std::shared_ptr<TextGizmo> textGiz = std::dynamic_pointer_cast<TextGizmo>(giz))
+					{
+						continue;
 					}
 
 					// If our current gizmo is at a lower depth than our hit gizmo, ignore it

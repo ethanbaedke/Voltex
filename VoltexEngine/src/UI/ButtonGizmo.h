@@ -16,13 +16,14 @@ namespace VoltexEngine {
 
 	public:
 
-		ButtonGizmo();
 
 		Event_NoParam OnButtonPressed;
 
-	protected:
+		ButtonGizmo();
 
 		virtual void SetColor(const Color& color) override;
+
+	protected:
 
 		virtual void HandleCursorEnter() override;
 		virtual void HandleCursorLeave() override;

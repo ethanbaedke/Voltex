@@ -4,6 +4,8 @@
 #include "Console.h"
 #include "FileLoader.h"
 #include "Input.h"
+#include "UI/LayoutGizmo.h"
+#include "UI/TextGizmo.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -20,6 +22,7 @@ namespace VoltexEngine {
 	int Renderer::s_WindowHeight;
 	GLuint Renderer::s_ShaderProgram;
 	GLuint Renderer::s_DefaultUITextureID;
+	GLuint Renderer::s_FontTextureIDs[];
 
 	bool Renderer::Init(int windowWidth, int windowHeight)
 	{
@@ -166,6 +169,35 @@ namespace VoltexEngine {
 		// Enable transparency rendering
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		// Load font textures, doing this manually to be explicit about the order they are stored in
+		int width, height;
+		s_FontTextureIDs[0] = GenerateTexture("../VoltexEngine/textures/font/Font_A.png", &width, &height);
+		s_FontTextureIDs[1] = GenerateTexture("../VoltexEngine/textures/font/Font_B.png", &width, &height);
+		s_FontTextureIDs[2] = GenerateTexture("../VoltexEngine/textures/font/Font_C.png", &width, &height);
+		s_FontTextureIDs[3] = GenerateTexture("../VoltexEngine/textures/font/Font_D.png", &width, &height);
+		s_FontTextureIDs[4] = GenerateTexture("../VoltexEngine/textures/font/Font_E.png", &width, &height);
+		s_FontTextureIDs[5] = GenerateTexture("../VoltexEngine/textures/font/Font_F.png", &width, &height);
+		s_FontTextureIDs[6] = GenerateTexture("../VoltexEngine/textures/font/Font_G.png", &width, &height);
+		s_FontTextureIDs[7] = GenerateTexture("../VoltexEngine/textures/font/Font_H.png", &width, &height);
+		s_FontTextureIDs[8] = GenerateTexture("../VoltexEngine/textures/font/Font_I.png", &width, &height);
+		s_FontTextureIDs[9] = GenerateTexture("../VoltexEngine/textures/font/Font_J.png", &width, &height);
+		s_FontTextureIDs[10] = GenerateTexture("../VoltexEngine/textures/font/Font_K.png", &width, &height);
+		s_FontTextureIDs[11] = GenerateTexture("../VoltexEngine/textures/font/Font_L.png", &width, &height);
+		s_FontTextureIDs[12] = GenerateTexture("../VoltexEngine/textures/font/Font_M.png", &width, &height);
+		s_FontTextureIDs[13] = GenerateTexture("../VoltexEngine/textures/font/Font_N.png", &width, &height);
+		s_FontTextureIDs[14] = GenerateTexture("../VoltexEngine/textures/font/Font_O.png", &width, &height);
+		s_FontTextureIDs[15] = GenerateTexture("../VoltexEngine/textures/font/Font_P.png", &width, &height);
+		s_FontTextureIDs[16] = GenerateTexture("../VoltexEngine/textures/font/Font_Q.png", &width, &height);
+		s_FontTextureIDs[17] = GenerateTexture("../VoltexEngine/textures/font/Font_R.png", &width, &height);
+		s_FontTextureIDs[18] = GenerateTexture("../VoltexEngine/textures/font/Font_S.png", &width, &height);
+		s_FontTextureIDs[19] = GenerateTexture("../VoltexEngine/textures/font/Font_T.png", &width, &height);
+		s_FontTextureIDs[20] = GenerateTexture("../VoltexEngine/textures/font/Font_U.png", &width, &height);
+		s_FontTextureIDs[21] = GenerateTexture("../VoltexEngine/textures/font/Font_V.png", &width, &height);
+		s_FontTextureIDs[22] = GenerateTexture("../VoltexEngine/textures/font/Font_W.png", &width, &height);
+		s_FontTextureIDs[23] = GenerateTexture("../VoltexEngine/textures/font/Font_X.png", &width, &height);
+		s_FontTextureIDs[24] = GenerateTexture("../VoltexEngine/textures/font/Font_Y.png", &width, &height);
+		s_FontTextureIDs[25] = GenerateTexture("../VoltexEngine/textures/font/Font_Z.png", &width, &height);
 
 		// Bind input callbacks
 		glfwSetKeyCallback(s_Window, KeyCallback);
@@ -450,7 +482,7 @@ namespace VoltexEngine {
 		glUniform4f(fragmentColor, 1.0f, 1.0f, 1.0f, 1.0f);
 
 		// The number of units visible on the screen horizontally
-		float zoomOut = 42.0f;
+		float zoomOut = 82.0f;
 
 		// Calculated from the center of the screen to the bounds
 		float unitsX = zoomOut / 2.0f;
@@ -498,6 +530,16 @@ namespace VoltexEngine {
 
 	void Renderer::RenderUI(std::vector<std::shared_ptr<Gizmo>> rootGizmos)
 	{
+		// Create and bind the view matrix
+		glm::mat4 viewMatrix = glm::mat4(1.0f);
+		GLint vertexViewMatrix = glGetUniformLocation(s_ShaderProgram, "viewMatrix");
+		glUniformMatrix4fv(vertexViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+
+		// Create and bind the projection matrix
+		glm::mat4 projectionMatrix = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -6.0f, 1.0f);
+		GLint vertexProjectionMatrix = glGetUniformLocation(s_ShaderProgram, "projectionMatrix");
+		glUniformMatrix4fv(vertexProjectionMatrix, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+
 		// Depth first render all gizmos, render as we go
 		std::vector<std::shared_ptr<Gizmo>> renderStack(rootGizmos);
 
@@ -507,27 +549,52 @@ namespace VoltexEngine {
 			std::shared_ptr<Gizmo> giz = renderStack.back();
 			renderStack.pop_back();
 
-			// Set the texture for this gizmo
-			if (giz->UISprite)
-				glBindTexture(GL_TEXTURE_2D, giz->UISprite->GetTextureID());
-			else
-				glBindTexture(GL_TEXTURE_2D, s_DefaultUITextureID);
+			// Get the dimensions of the current gizmo
+			float xP, yP, xS, yS;
+			giz->GetDimensions(&xP, &yP, &xS, &yS);
+
+			// Set the UI color on the fragment shader
+			Color gizColor = giz->GetColor();
+			GLint fragmentColor = glGetUniformLocation(s_ShaderProgram, "color");
+			glUniform4f(fragmentColor, gizColor.R / 255.0f, gizColor.G / 255.0f, gizColor.B / 255.0f, gizColor.A / 255.0f);
 
 			// If the current gizmo is a layout gizmo, get its children and add them to the render stack
 			if (std::shared_ptr<LayoutGizmo> layGiz = std::dynamic_pointer_cast<LayoutGizmo>(giz))
 			{
 				std::vector<std::shared_ptr<Gizmo>> children = layGiz->GetChildren();
-				for (std::shared_ptr<Gizmo> childGiz : children)
-					renderStack.push_back(childGiz);
+				for (int i = children.size() - 1; i > -1; i--)
+					renderStack.push_back(children[i]);
+			}
+			// Otherwise, if the current gizmo is a text gizmo, render its text to the screen and move to the next iteration
+			else if (std::shared_ptr<TextGizmo> textGiz = std::dynamic_pointer_cast<TextGizmo>(giz))
+			{
+				int len = textGiz->Text.length();
+				xS /= textGiz->Text.length();
+				for (int i = 0; i < textGiz->Text.length(); i++)
+				{
+					if ((textGiz->Text[i] > 0x40 && textGiz->Text[i] < 0x5B))
+					{
+						glm::mat4 modelMatrix = glm::mat4(1.0f);
+						modelMatrix = glm::translate(modelMatrix, glm::vec3((2.0f * xP) + xS - 1.0f, (2.0f * yP) + yS - 1.0f, giz->Depth));
+						modelMatrix = glm::scale(modelMatrix, glm::vec3(xS * 2.0f, yS * 2.0f, 1.0f));
+						GLint vertexModelMatrix = glGetUniformLocation(s_ShaderProgram, "modelMatrix");
+						glUniformMatrix4fv(vertexModelMatrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+
+						glBindTexture(GL_TEXTURE_2D, s_FontTextureIDs[textGiz->Text[i] - 0x41]);
+						glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+					}
+
+					xP += xS;
+				}
+				// We do this because we dont want to render the text gizmo itself, just the text it holds
+				continue;
 			}
 
-			float xP, yP, xS, yS;
-			giz->GetDimensions(&xP, &yP, &xS, &yS);
-
-			// Set the UI color on the fragment shader
-			Color uiColor = giz->GetColor();
-			GLint fragmentColor = glGetUniformLocation(s_ShaderProgram, "color");
-			glUniform4f(fragmentColor, uiColor.R / 255.0f, uiColor.G / 255.0f, uiColor.B / 255.0f, uiColor.A / 255.0f);
+			// Set the texture for this gizmo
+			if (giz->UISprite)
+				glBindTexture(GL_TEXTURE_2D, giz->UISprite->GetTextureID());
+			else
+				glBindTexture(GL_TEXTURE_2D, s_DefaultUITextureID);
 
 			// Create and bind the model matrix
 			glm::mat4 modelMatrix = glm::mat4(1.0f);
@@ -536,16 +603,7 @@ namespace VoltexEngine {
 			GLint vertexModelMatrix = glGetUniformLocation(s_ShaderProgram, "modelMatrix");
 			glUniformMatrix4fv(vertexModelMatrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 
-			// Create and bind the view matrix
-			glm::mat4 viewMatrix = glm::mat4(1.0f);
-			GLint vertexViewMatrix = glGetUniformLocation(s_ShaderProgram, "viewMatrix");
-			glUniformMatrix4fv(vertexViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
-
-			// Create and bind the projection matrix
-			glm::mat4 projectionMatrix = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, -4.0f, 1.0f);
-			GLint vertexProjectionMatrix = glGetUniformLocation(s_ShaderProgram, "projectionMatrix");
-			glUniformMatrix4fv(vertexProjectionMatrix, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-
+			// Draw the elements to the screen
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}
 	}

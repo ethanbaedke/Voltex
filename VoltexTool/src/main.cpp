@@ -97,15 +97,33 @@ public:
 		std::shared_ptr<HorizontalLayoutGizmo> fileSelector = CreateGizmo<HorizontalLayoutGizmo>();
 		vertLayout->AddChild(fileSelector);
 
+		// Save layout to hold button and text
+		std::shared_ptr<OverlapLayoutGizmo> saveLayout = CreateGizmo<OverlapLayoutGizmo>();
+		fileSelector->AddChild(saveLayout);
+
 		// Save button
-		std::shared_ptr<ButtonGizmo> save = CreateGizmo<ButtonGizmo>();
-		save->OnButtonPressed.AddCallback([&] { Save(); });
-		fileSelector->AddChild(save);
+		std::shared_ptr<ButtonGizmo> saveButton = CreateGizmo<ButtonGizmo>();
+		saveButton->OnButtonPressed.AddCallback([&] { Save(); });
+		saveLayout->AddChild(saveButton);
+
+		// Save text
+		std::shared_ptr<TextGizmo> saveText = CreateGizmo<TextGizmo>(); saveText->SetColor(Color(0, 0, 128, 255));
+		saveText->Text = "SAVE ROOM";
+		saveLayout->AddChild(saveText);
+
+		// Load layout to hold button and text
+		std::shared_ptr<OverlapLayoutGizmo> loadLayout = CreateGizmo<OverlapLayoutGizmo>();
+		fileSelector->AddChild(loadLayout);
 
 		// Load button
-		std::shared_ptr<ButtonGizmo> load = CreateGizmo<ButtonGizmo>();
-		load->OnButtonPressed.AddCallback([&] { Load(); });
-		fileSelector->AddChild(load);
+		std::shared_ptr<ButtonGizmo> loadButton = CreateGizmo<ButtonGizmo>();
+		loadButton->OnButtonPressed.AddCallback([&] { Load(); });
+		loadLayout->AddChild(loadButton);
+
+		// Load text
+		std::shared_ptr<TextGizmo> loadText = CreateGizmo<TextGizmo>(); loadText->SetColor(Color(0, 0, 128, 255));
+		loadText->Text = "LOAD ROOM";
+		loadLayout->AddChild(loadText);
 	}
 
 private:

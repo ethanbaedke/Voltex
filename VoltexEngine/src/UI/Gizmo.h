@@ -53,13 +53,12 @@ namespace VoltexEngine {
 		void SetDimensions(float xPos, float yPos, float xSize, float ySize);
 		void GetDimensions(float* outXPos, float* outYPos, float* outXSize, float* outYSize) const;
 
+		virtual void SetColor(const Color& color) { m_Color = color; }
 		inline const Color& GetColor() const { return m_Color; }
 
 		virtual std::string GetPrintable() const override;
 
 	protected:
-
-		virtual void SetColor(const Color& color) { m_Color = color; }
 
 		virtual void HandleCursorEnter() {};
 		virtual void HandleCursorLeave() {};

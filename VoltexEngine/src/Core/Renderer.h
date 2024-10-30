@@ -3,7 +3,7 @@
 
 #include "GameObject.h"
 #include "Sprite.h"
-#include "UI/LayoutGizmo.h"
+#include "UI/Gizmo.h"
 
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
@@ -24,6 +24,9 @@ namespace VoltexEngine {
 		static GLuint s_ShaderProgram;
 
 		static GLuint s_DefaultUITextureID;
+
+		/* A list containing the texture IDs of all the letters of the alphabet for text rendering */
+		static GLuint s_FontTextureIDs[26];
 
 	public:
 

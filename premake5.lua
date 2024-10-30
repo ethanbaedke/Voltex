@@ -94,7 +94,7 @@ project "VoltexEngine"
         "VoltexEngine/src/**.cpp",
         "VoltexEngine/src/Shaders/*.vert",
         "VoltexEngine/src/Shaders/*.frag",
-        "VoltexEngine/textures/*.png"
+        "VoltexEngine/textures/**.png"
     }
 
     includedirs

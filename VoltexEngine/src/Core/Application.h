@@ -2,7 +2,7 @@
 #include "vxpch.h"
 
 #include "GameObject.h"
-#include "UI/LayoutGizmo.h"
+#include "UI/Gizmo.h"
 
 namespace VoltexEngine {
 

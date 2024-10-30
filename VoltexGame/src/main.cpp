@@ -13,7 +13,7 @@ public:
 	Game()
 	{
 		// Create a level
-		Level level(Vector(0, 0), Vector(2, 2));
+		Level level(Vector(0, 0), Vector(4, 4));
 	}
 
 };
