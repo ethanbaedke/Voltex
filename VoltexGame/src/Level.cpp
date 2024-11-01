@@ -53,11 +53,13 @@ Level::Level(const Vector& position, Vector& size)
 		std::shared_ptr<GameObject> topObj = Application::Current->CreateObject<GameObject>();
 		std::shared_ptr<SpriteComponent> topSprComp = topObj->AddComponent<SpriteComponent>();
 		topSprComp->Sprite = s_TileSprites[1];
+		topObj->AddComponent<CollisionComponent>();
 		topObj->Position.X = borderX;
 		topObj->Position.Y = position.Y + 1;
 		std::shared_ptr<GameObject> bottomObj = Application::Current->CreateObject<GameObject>();
 		std::shared_ptr<SpriteComponent> bottomSprComp = bottomObj->AddComponent<SpriteComponent>();
 		bottomSprComp->Sprite = s_TileSprites[1];
+		bottomObj->AddComponent<CollisionComponent>();
 		bottomObj->Position.X = borderX;
 		bottomObj->Position.Y = position.Y - (size.Y * ROOM_HEIGHT);
 	}
@@ -68,11 +70,13 @@ Level::Level(const Vector& position, Vector& size)
 		std::shared_ptr<GameObject> leftObj = Application::Current->CreateObject<GameObject>();
 		std::shared_ptr<SpriteComponent> leftSprComp = leftObj->AddComponent<SpriteComponent>();
 		leftSprComp->Sprite = s_TileSprites[1];
+		leftObj->AddComponent<CollisionComponent>();
 		leftObj->Position.X = position.X - 1;
 		leftObj->Position.Y = borderY;
 		std::shared_ptr<GameObject> rightObj = Application::Current->CreateObject<GameObject>();
 		std::shared_ptr<SpriteComponent> rightSprComp = rightObj->AddComponent<SpriteComponent>();
 		rightSprComp->Sprite = s_TileSprites[1];
+		rightObj->AddComponent<CollisionComponent>();
 		rightObj->Position.X = position.X + (size.Y * ROOM_WIDTH);
 		rightObj->Position.Y = borderY;
 	}
@@ -135,6 +139,7 @@ Level::Level(const Vector& position, Vector& size)
 					std::shared_ptr<GameObject> obj = Application::Current->CreateObject<GameObject>();
 					std::shared_ptr<SpriteComponent> sprComp = obj->AddComponent<SpriteComponent>();
 					sprComp->Sprite = s_TileSprites[byte];
+					obj->AddComponent<CollisionComponent>();
 					obj->Position.X = xOffset + x;
 					obj->Position.Y = yOffset - y;
 				}

@@ -29,9 +29,13 @@ namespace VoltexEngine {
 
 		float Dot(const Vector& other) const;
 
+		Vector& operator+=(const Vector& other);
 		Vector operator+(const Vector& other) const;
+		Vector& operator-=(const Vector& other);
 		Vector operator-(const Vector& other) const;
+		Vector& operator*=(float scalar);
 		Vector operator*(float scalar) const;
+		Vector& operator/=(float divisor);
 		Vector operator/(float divisor) const;
 
 		virtual std::string GetPrintable() const override;

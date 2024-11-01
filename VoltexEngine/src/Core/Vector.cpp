@@ -30,9 +30,23 @@ namespace VoltexEngine {
 		return (X * other.X) + (Y * other.Y);
 	}
 
+	Vector& Vector::operator+=(const Vector& other)
+	{
+		X += other.X;
+		Y += other.Y;
+		return *this;
+	}
+
 	Vector Vector::operator+(const Vector& other) const
 	{
 		return Vector(X + other.X, Y + other.Y);
+	}
+
+	Vector& Vector::operator-=(const Vector& other)
+	{
+		X -= other.X;
+		Y -= other.Y;
+		return *this;
 	}
 
 	Vector Vector::operator-(const Vector& other) const
@@ -40,9 +54,23 @@ namespace VoltexEngine {
 		return Vector(X - other.X, Y - other.Y);
 	}
 
+	Vector& Vector::operator*=(float scalar)
+	{
+		X *= scalar;
+		Y *= scalar;
+		return *this;
+	}
+
 	Vector Vector::operator*(float scalar) const
 	{
 		return Vector(X * scalar, Y * scalar);
+	}
+
+	Vector& Vector::operator/=(float divisor)
+	{
+		X /= divisor;
+		Y /= divisor;
+		return *this;
 	}
 
 	Vector Vector::operator/(float divisor) const

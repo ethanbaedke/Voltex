@@ -54,6 +54,8 @@ namespace VoltexEngine {
 			while (i < m_Components.size())
 				if (std::shared_ptr<T> comp = std::dynamic_pointer_cast<T>(m_Components[i]))
 					return comp;
+				else
+					i++;
 			return nullptr;
 		}
 

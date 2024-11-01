@@ -13,3 +13,4 @@
 
 #include "Component/Component.h"
 #include "Component/SpriteComponent.h"
+#include "Component/CollisionComponent.h"

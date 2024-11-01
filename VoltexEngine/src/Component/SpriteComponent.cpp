@@ -4,7 +4,7 @@
 namespace VoltexEngine {
 
 	SpriteComponent::SpriteComponent()
-		: Sprite(nullptr)
+		: Component(), Sprite(nullptr)
 	{
 	}
 

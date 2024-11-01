@@ -7,6 +7,7 @@
 #include "Input.h"
 #include "UI/LayoutGizmo.h"
 #include "UI/TextGizmo.h"
+#include "Component/CollisionComponent.h"
 #include "tinyfiledialogs.h"
 
 #include <chrono>
@@ -110,12 +111,37 @@ namespace VoltexEngine {
 				m_GameObjects.push_back(obj);
 			}
 
-			// Update game objects
+			std::vector<std::shared_ptr<GameObject>> hitObjects;
+
+			// Update game objects and get colliders (for collision step)
 			auto currentFrameTime = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<float> deltaTime = currentFrameTime - prevFrameTime;
 			for (std::shared_ptr<GameObject> obj : m_GameObjects)
+			{
 				obj->Update(deltaTime.count());
+				if (obj->GetComponent<CollisionComponent>())
+					hitObjects.push_back(obj);
+			}
 			prevFrameTime = currentFrameTime;
+
+			// Handle Collision
+			for (int i = 0; i < ((int)hitObjects.size()) - 1; i++)
+			{
+				for (int f = i + 1; f < hitObjects.size(); f++)
+				{
+					Vector blA = hitObjects[i]->Position - hitObjects[i]->GetComponent<CollisionComponent>()->Size / 2;
+					Vector trA = hitObjects[i]->Position + hitObjects[i]->GetComponent<CollisionComponent>()->Size / 2;
+					Vector blB = hitObjects[f]->Position - hitObjects[f]->GetComponent<CollisionComponent>()->Size / 2;
+					Vector trB = hitObjects[f]->Position + hitObjects[f]->GetComponent<CollisionComponent>()->Size / 2;
+					if (blA.X >= trB.X || trA.X <= blB.X || blA.Y >= trB.Y || trA.Y <= blB.Y)
+						continue;
+					else
+					{
+						hitObjects[i]->GetComponent<CollisionComponent>()->OnCollision.Invoke(hitObjects[f]->GetComponent<CollisionComponent>());
+						hitObjects[f]->GetComponent<CollisionComponent>()->OnCollision.Invoke(hitObjects[i]->GetComponent<CollisionComponent>());
+					}
+				}
+			}
 
 			// Update UI, removing gizmos that are no longer root gizmos from the root gizmos list
 			for (std::shared_ptr<Gizmo> giz : m_RootGizmos)
