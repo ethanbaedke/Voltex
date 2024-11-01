@@ -51,11 +51,13 @@ Level::Level(const Vector& position, Vector& size)
 		// Create an object for the tile, set its sprite, and position it in the world
 		// Do this for the top and bottom of the level
 		std::shared_ptr<GameObject> topObj = Application::Current->CreateObject<GameObject>();
-		topObj->ObjectSprite = s_TileSprites[1];
+		std::shared_ptr<SpriteComponent> topSprComp = topObj->AddComponent<SpriteComponent>();
+		topSprComp->Sprite = s_TileSprites[1];
 		topObj->Position.X = borderX;
 		topObj->Position.Y = position.Y + 1;
 		std::shared_ptr<GameObject> bottomObj = Application::Current->CreateObject<GameObject>();
-		bottomObj->ObjectSprite = s_TileSprites[1];
+		std::shared_ptr<SpriteComponent> bottomSprComp = bottomObj->AddComponent<SpriteComponent>();
+		bottomSprComp->Sprite = s_TileSprites[1];
 		bottomObj->Position.X = borderX;
 		bottomObj->Position.Y = position.Y - (size.Y * ROOM_HEIGHT);
 	}
@@ -64,11 +66,13 @@ Level::Level(const Vector& position, Vector& size)
 		// Create an object for the tile, set its sprite, and position it in the world
 		// Do this for the left and right sides of the level
 		std::shared_ptr<GameObject> leftObj = Application::Current->CreateObject<GameObject>();
-		leftObj->ObjectSprite = s_TileSprites[1];
+		std::shared_ptr<SpriteComponent> leftSprComp = leftObj->AddComponent<SpriteComponent>();
+		leftSprComp->Sprite = s_TileSprites[1];
 		leftObj->Position.X = position.X - 1;
 		leftObj->Position.Y = borderY;
 		std::shared_ptr<GameObject> rightObj = Application::Current->CreateObject<GameObject>();
-		rightObj->ObjectSprite = s_TileSprites[1];
+		std::shared_ptr<SpriteComponent> rightSprComp = rightObj->AddComponent<SpriteComponent>();
+		rightSprComp->Sprite = s_TileSprites[1];
 		rightObj->Position.X = position.X + (size.Y * ROOM_WIDTH);
 		rightObj->Position.Y = borderY;
 	}
@@ -129,7 +133,8 @@ Level::Level(const Vector& position, Vector& size)
 
 					// Create an object for the tile, set its sprite, and position it in the world
 					std::shared_ptr<GameObject> obj = Application::Current->CreateObject<GameObject>();
-					obj->ObjectSprite = s_TileSprites[byte];
+					std::shared_ptr<SpriteComponent> sprComp = obj->AddComponent<SpriteComponent>();
+					sprComp->Sprite = s_TileSprites[byte];
 					obj->Position.X = xOffset + x;
 					obj->Position.Y = yOffset - y;
 				}

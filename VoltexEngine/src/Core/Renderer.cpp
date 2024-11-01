@@ -6,6 +6,7 @@
 #include "Input.h"
 #include "UI/LayoutGizmo.h"
 #include "UI/TextGizmo.h"
+#include "Component/SpriteComponent.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -491,35 +492,42 @@ namespace VoltexEngine {
 		// The game objects passed into this function have already been filtered, no need to check for expiration
 		for (std::shared_ptr<GameObject> obj : gameObjects)
 		{
-			if (std::shared_ptr<Sprite> spr = obj->ObjectSprite)
+			if (std::shared_ptr<SpriteComponent> sprComp = obj->GetComponent<SpriteComponent>())
 			{
-				// Bind the texture for this sprite
-				glBindTexture(GL_TEXTURE_2D, spr->GetTextureID());
+				if (std::shared_ptr<Sprite> spr = sprComp->Sprite)
+				{
+					// Bind the texture for this sprite
+					glBindTexture(GL_TEXTURE_2D, spr->GetTextureID());
 
-				// Get the position, scale, and rotation of the game object
-				Vector position = obj->Position;
-				float radianAngle = glm::radians(obj->Angle);
-				int depth = obj->Depth;
+					// Get the position, scale, and rotation of the game object
+					Vector position = obj->Position;
+					float radianAngle = glm::radians(obj->Angle);
+					int depth = obj->Depth;
 
-				// Create and bind the model matrix
-				glm::mat4 modelMatrix = glm::mat4(1.0f);
-				modelMatrix = glm::translate(modelMatrix, glm::vec3(position.X, position.Y, depth));
-				modelMatrix = glm::rotate(modelMatrix, radianAngle, glm::vec3(0.0f, 0.0f, 1.0f));
-				modelMatrix = glm::scale(modelMatrix, glm::vec3((float)spr->GetWidth() / PPU, (float)spr->GetHeight() / PPU, 0.0f));
-				GLint vertexModelMatrix = glGetUniformLocation(s_ShaderProgram, "modelMatrix");
-				glUniformMatrix4fv(vertexModelMatrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+					// Create and bind the model matrix
+					glm::mat4 modelMatrix = glm::mat4(1.0f);
+					modelMatrix = glm::translate(modelMatrix, glm::vec3(position.X, position.Y, depth));
+					modelMatrix = glm::rotate(modelMatrix, radianAngle, glm::vec3(0.0f, 0.0f, 1.0f));
+					modelMatrix = glm::scale(modelMatrix, glm::vec3((float)spr->GetWidth() / PPU, (float)spr->GetHeight() / PPU, 0.0f));
+					GLint vertexModelMatrix = glGetUniformLocation(s_ShaderProgram, "modelMatrix");
+					glUniformMatrix4fv(vertexModelMatrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 
-				// Create and bind the view matrix
-				glm::mat4 viewMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-unitsX + 1.5f, unitsY - 1.5f, 0.0f));
-				GLint vertexViewMatrix = glGetUniformLocation(s_ShaderProgram, "viewMatrix");
-				glUniformMatrix4fv(vertexViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+					// Create and bind the view matrix
+					glm::mat4 viewMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(-unitsX + 1.5f, unitsY - 1.5f, 0.0f));
+					GLint vertexViewMatrix = glGetUniformLocation(s_ShaderProgram, "viewMatrix");
+					glUniformMatrix4fv(vertexViewMatrix, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 
-				// Create and bind the projection matrix
-				glm::mat4 projectionMatrix = glm::ortho(-unitsX, unitsX, -unitsY, unitsY);
-				GLint vertexProjectionMatrix = glGetUniformLocation(s_ShaderProgram, "projectionMatrix");
-				glUniformMatrix4fv(vertexProjectionMatrix, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+					// Create and bind the projection matrix
+					glm::mat4 projectionMatrix = glm::ortho(-unitsX, unitsX, -unitsY, unitsY);
+					GLint vertexProjectionMatrix = glGetUniformLocation(s_ShaderProgram, "projectionMatrix");
+					glUniformMatrix4fv(vertexProjectionMatrix, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 
-				glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+					glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+				}
+				else
+				{
+					glBindTexture(GL_TEXTURE_2D, 0);
+				}
 			}
 			else
 			{

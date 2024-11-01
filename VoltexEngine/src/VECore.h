@@ -10,3 +10,6 @@
 #include "Core/Sprite.h"
 #include "Core/Input.h"
 #include "Core/Color.h"
+
+#include "Component/Component.h"
+#include "Component/SpriteComponent.h"
