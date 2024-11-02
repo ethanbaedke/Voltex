@@ -111,34 +111,79 @@ namespace VoltexEngine {
 				m_GameObjects.push_back(obj);
 			}
 
-			std::vector<std::shared_ptr<GameObject>> hitObjects;
+			std::vector<std::shared_ptr<GameObject>> staticObjects;
+			std::vector<std::shared_ptr<GameObject>> dynamicObjects;
 
 			// Update game objects and get colliders (for collision step)
 			auto currentFrameTime = std::chrono::high_resolution_clock::now();
 			std::chrono::duration<float> deltaTime = currentFrameTime - prevFrameTime;
+
 			for (std::shared_ptr<GameObject> obj : m_GameObjects)
 			{
 				obj->Update(deltaTime.count());
-				if (obj->GetComponent<CollisionComponent>())
-					hitObjects.push_back(obj);
+				if (std::shared_ptr<CollisionComponent> colComp = obj->GetComponent<CollisionComponent>())
+				{
+					if (!colComp->IsDynamic)
+						staticObjects.push_back(obj);
+					else
+						dynamicObjects.push_back(obj);
+				}
 			}
 			prevFrameTime = currentFrameTime;
 
-			// Handle Collision
-			for (int i = 0; i < ((int)hitObjects.size()) - 1; i++)
+			// Handle collision
+			for (int i = 0; i < dynamicObjects.size(); i++)
 			{
-				for (int f = i + 1; f < hitObjects.size(); f++)
+				// Get the dynamic object and its collision component
+				std::shared_ptr<GameObject> objA = dynamicObjects[i];
+				std::shared_ptr<CollisionComponent> colA = objA->GetComponent<CollisionComponent>();
+
+				// Get the bottom left and top right coordinates of its collision component
+				Vector blA = objA->Position - (colA->Size / 2);
+				Vector trA = objA->Position + (colA->Size / 2);
+
+				// If this isnt the last object in the list, check it against all other dynamic objects
+				if (i < (int)dynamicObjects.size() - 1)
 				{
-					Vector blA = hitObjects[i]->Position - hitObjects[i]->GetComponent<CollisionComponent>()->Size / 2;
-					Vector trA = hitObjects[i]->Position + hitObjects[i]->GetComponent<CollisionComponent>()->Size / 2;
-					Vector blB = hitObjects[f]->Position - hitObjects[f]->GetComponent<CollisionComponent>()->Size / 2;
-					Vector trB = hitObjects[f]->Position + hitObjects[f]->GetComponent<CollisionComponent>()->Size / 2;
+					for (int f = i + 1; f < dynamicObjects.size(); f++)
+					{
+						// Get the other dynamic object and its collision component
+						std::shared_ptr<GameObject> objB = dynamicObjects[f];
+						std::shared_ptr<CollisionComponent> colB = objB->GetComponent<CollisionComponent>();
+
+						// Get the bottom left and top right coordinates of its collision component
+						Vector blB = objB->Position - (colB->Size / 2);
+						Vector trB = objB->Position + (colB->Size / 2);
+
+						// Check if the two are colliding
+						if (blA.X >= trB.X || trA.X <= blB.X || blA.Y >= trB.Y || trA.Y <= blB.Y)
+							continue;
+						else
+						{
+							colA->OnCollision.Invoke(colB);
+							colB->OnCollision.Invoke(colA);
+						}
+					}
+				}
+
+				// Check this object against all static objects
+				for (int f = 0; f < staticObjects.size(); f++)
+				{
+					// Get the static object and its collision component
+					std::shared_ptr<GameObject> objB = staticObjects[f];
+					std::shared_ptr<CollisionComponent> colB = objB->GetComponent<CollisionComponent>();
+
+					// Get the bottom left and top right coordinates of its collision component
+					Vector blB = objB->Position - (colB->Size / 2);
+					Vector trB = objB->Position + (colB->Size / 2);
+
+					// Check if the two are colliding
 					if (blA.X >= trB.X || trA.X <= blB.X || blA.Y >= trB.Y || trA.Y <= blB.Y)
 						continue;
 					else
 					{
-						hitObjects[i]->GetComponent<CollisionComponent>()->OnCollision.Invoke(hitObjects[f]->GetComponent<CollisionComponent>());
-						hitObjects[f]->GetComponent<CollisionComponent>()->OnCollision.Invoke(hitObjects[i]->GetComponent<CollisionComponent>());
+						colA->OnCollision.Invoke(colB);
+						colB->OnCollision.Invoke(colA);
 					}
 				}
 			}

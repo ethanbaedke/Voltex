@@ -14,6 +14,9 @@ namespace VoltexEngine {
 
 		Vector Size;
 
+		/* If this component is dynamic, it means that the object its attached to will be moving around the screen, this should be false whenever possible */
+		bool IsDynamic;
+
 		Event_OneParam<std::shared_ptr<CollisionComponent>> OnCollision;
 
 	public:

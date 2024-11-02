@@ -32,6 +32,7 @@ public:
 		m_SprComp = AddComponent<SpriteComponent>();
 		m_SprComp->Sprite = playerSpr;
 		m_ColComp = AddComponent<CollisionComponent>();
+		m_ColComp->IsDynamic = true;
 		m_ColComp->OnCollision.AddCallback([&](std::shared_ptr<CollisionComponent> otherColComp) { OnCollisionCallback(otherColComp); });
 	}
 
