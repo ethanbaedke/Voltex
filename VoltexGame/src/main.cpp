@@ -80,11 +80,11 @@ public:
 
 	Game()
 	{
-		playerSpr = CreateSprite("textures/Player.png");
+		playerSpr = Sprite::Create("textures/Player.png");
 
 		// Create a level
 		Level level(Vector(0, 0), Vector(4, 4));
-		std::shared_ptr<Player> player = CreateObject<Player>();
+		std::shared_ptr<Player> player = GameObject::Create<Player>();
 		player->Depth = 1;
 	}
 

@@ -8,24 +8,22 @@ namespace VoltexEngine {
 	class Sprite
 	{
 
-	private:
+	public:
 
-		/* This is used exclusively by the renderer */
-		unsigned int m_TextureID;
+		static Event_TwoParam<std::shared_ptr<Sprite>, const std::string&> OnCreated;
 
-		/* The pixel width and height of the texture this sprite is holding */
-		int m_Width;
-		int m_Height;
+		/* Creates and returns a Sprite */
+		static std::shared_ptr<Sprite> Create(const std::string& texturePath);
 
 	public:
 
-		Sprite(int width, int height, unsigned int textureID);
+		/* The pixel width and height of the texture this sprite is holding */
+		int PixelWidth;
+		int PixelHeight;
 
-		/* These should only be called by the renderer */
-		inline unsigned int GetTextureID() const { return m_TextureID; }
+	public:
 
-		inline int GetWidth() const { return m_Width; }
-		inline int GetHeight() const { return m_Height; }
+		Sprite();
 
 	};
 

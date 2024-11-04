@@ -6,6 +6,7 @@
 namespace VoltexEngine {
 
 	std::shared_ptr<Gizmo> Gizmo::s_Focused;
+	Event_OneParam<std::shared_ptr<Gizmo>> Gizmo::OnCreated;
 
 	void Gizmo::CursorOverlap(std::shared_ptr<Gizmo> gizmo)
 	{

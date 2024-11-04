@@ -17,6 +17,17 @@ namespace VoltexEngine {
 
 	public:
 
+		static Event_OneParam<std::shared_ptr<Gizmo>> OnCreated;
+
+		/* Creates and returns a Gizmo */
+		template <typename T>
+		static std::shared_ptr<T> Create()
+		{
+			std::shared_ptr<T> giz = std::make_shared<T>();
+			OnCreated.Invoke(giz);
+			return giz;
+		}
+
 		static void CursorOverlap(std::shared_ptr<Gizmo> gizmo);
 		static void CursorSelect();
 

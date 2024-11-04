@@ -14,6 +14,19 @@ namespace VoltexEngine {
 
 	public:
 
+		static Event_OneParam<std::shared_ptr<GameObject>> OnCreated;
+
+		/* Creates an returns a GameObject or any subclass of a GameObject */
+		template <typename T>
+		static std::shared_ptr<T> Create()
+		{
+			std::shared_ptr<T> obj = std::make_shared<T>();
+			OnCreated.Invoke(obj);
+			return obj;
+		}
+
+	public:
+
 		/* This objects position in the world */
 		Vector Position;
 

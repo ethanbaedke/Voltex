@@ -22,8 +22,9 @@ namespace VoltexEngine {
 	int Renderer::s_WindowWidth;
 	int Renderer::s_WindowHeight;
 	GLuint Renderer::s_ShaderProgram;
-	GLuint Renderer::s_DefaultUITextureID;
-	GLuint Renderer::s_FontTextureIDs[];
+	std::unordered_map<std::shared_ptr<Sprite>, GLuint, Renderer::SpriteHash, Renderer::SpriteEqual> Renderer::s_SpriteMap;
+	std::shared_ptr<Sprite> Renderer::s_DefaultUISprite;
+	std::shared_ptr<Sprite> Renderer::s_FontSprites[];
 
 	bool Renderer::Init(int windowWidth, int windowHeight)
 	{
@@ -72,6 +73,9 @@ namespace VoltexEngine {
 			return false;
 		}
 		VX_LOG("GLAD loaded");
+
+		// Bind sprite creation callback
+		Sprite::OnCreated.AddCallback([&](std::shared_ptr<Sprite> sprite, const std::string& texturePath) { HandleSpriteCreated(sprite, texturePath); });
 
 		// Enable depth ordering for rendering
 		glEnable(GL_DEPTH_TEST);
@@ -164,41 +168,39 @@ namespace VoltexEngine {
 		glEnableVertexAttribArray(vertexInTexCoords);
 
 		// Load the UI texture
-		int defaultUITextureWidth, defaultUITextureHeight;
-		s_DefaultUITextureID = GenerateTexture("../VoltexEngine/textures/UIDefault.png", &defaultUITextureWidth, &defaultUITextureHeight);
+		s_DefaultUISprite = Sprite::Create("../VoltexEngine/textures/UIDefault.png");
 
 		// Enable transparency rendering
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		// Load font textures, doing this manually to be explicit about the order they are stored in
-		int width, height;
-		s_FontTextureIDs[0] = GenerateTexture("../VoltexEngine/textures/font/Font_A.png", &width, &height);
-		s_FontTextureIDs[1] = GenerateTexture("../VoltexEngine/textures/font/Font_B.png", &width, &height);
-		s_FontTextureIDs[2] = GenerateTexture("../VoltexEngine/textures/font/Font_C.png", &width, &height);
-		s_FontTextureIDs[3] = GenerateTexture("../VoltexEngine/textures/font/Font_D.png", &width, &height);
-		s_FontTextureIDs[4] = GenerateTexture("../VoltexEngine/textures/font/Font_E.png", &width, &height);
-		s_FontTextureIDs[5] = GenerateTexture("../VoltexEngine/textures/font/Font_F.png", &width, &height);
-		s_FontTextureIDs[6] = GenerateTexture("../VoltexEngine/textures/font/Font_G.png", &width, &height);
-		s_FontTextureIDs[7] = GenerateTexture("../VoltexEngine/textures/font/Font_H.png", &width, &height);
-		s_FontTextureIDs[8] = GenerateTexture("../VoltexEngine/textures/font/Font_I.png", &width, &height);
-		s_FontTextureIDs[9] = GenerateTexture("../VoltexEngine/textures/font/Font_J.png", &width, &height);
-		s_FontTextureIDs[10] = GenerateTexture("../VoltexEngine/textures/font/Font_K.png", &width, &height);
-		s_FontTextureIDs[11] = GenerateTexture("../VoltexEngine/textures/font/Font_L.png", &width, &height);
-		s_FontTextureIDs[12] = GenerateTexture("../VoltexEngine/textures/font/Font_M.png", &width, &height);
-		s_FontTextureIDs[13] = GenerateTexture("../VoltexEngine/textures/font/Font_N.png", &width, &height);
-		s_FontTextureIDs[14] = GenerateTexture("../VoltexEngine/textures/font/Font_O.png", &width, &height);
-		s_FontTextureIDs[15] = GenerateTexture("../VoltexEngine/textures/font/Font_P.png", &width, &height);
-		s_FontTextureIDs[16] = GenerateTexture("../VoltexEngine/textures/font/Font_Q.png", &width, &height);
-		s_FontTextureIDs[17] = GenerateTexture("../VoltexEngine/textures/font/Font_R.png", &width, &height);
-		s_FontTextureIDs[18] = GenerateTexture("../VoltexEngine/textures/font/Font_S.png", &width, &height);
-		s_FontTextureIDs[19] = GenerateTexture("../VoltexEngine/textures/font/Font_T.png", &width, &height);
-		s_FontTextureIDs[20] = GenerateTexture("../VoltexEngine/textures/font/Font_U.png", &width, &height);
-		s_FontTextureIDs[21] = GenerateTexture("../VoltexEngine/textures/font/Font_V.png", &width, &height);
-		s_FontTextureIDs[22] = GenerateTexture("../VoltexEngine/textures/font/Font_W.png", &width, &height);
-		s_FontTextureIDs[23] = GenerateTexture("../VoltexEngine/textures/font/Font_X.png", &width, &height);
-		s_FontTextureIDs[24] = GenerateTexture("../VoltexEngine/textures/font/Font_Y.png", &width, &height);
-		s_FontTextureIDs[25] = GenerateTexture("../VoltexEngine/textures/font/Font_Z.png", &width, &height);
+		s_FontSprites[0] = Sprite::Create("../VoltexEngine/textures/font/Font_A.png");
+		s_FontSprites[1] = Sprite::Create("../VoltexEngine/textures/font/Font_B.png");
+		s_FontSprites[2] = Sprite::Create("../VoltexEngine/textures/font/Font_C.png");
+		s_FontSprites[3] = Sprite::Create("../VoltexEngine/textures/font/Font_D.png");
+		s_FontSprites[4] = Sprite::Create("../VoltexEngine/textures/font/Font_E.png");
+		s_FontSprites[5] = Sprite::Create("../VoltexEngine/textures/font/Font_F.png");
+		s_FontSprites[6] = Sprite::Create("../VoltexEngine/textures/font/Font_G.png");
+		s_FontSprites[7] = Sprite::Create("../VoltexEngine/textures/font/Font_H.png");
+		s_FontSprites[8] = Sprite::Create("../VoltexEngine/textures/font/Font_I.png");
+		s_FontSprites[9] = Sprite::Create("../VoltexEngine/textures/font/Font_J.png");
+		s_FontSprites[10] = Sprite::Create("../VoltexEngine/textures/font/Font_K.png");
+		s_FontSprites[11] = Sprite::Create("../VoltexEngine/textures/font/Font_L.png");
+		s_FontSprites[12] = Sprite::Create("../VoltexEngine/textures/font/Font_M.png");
+		s_FontSprites[13] = Sprite::Create("../VoltexEngine/textures/font/Font_N.png");
+		s_FontSprites[14] = Sprite::Create("../VoltexEngine/textures/font/Font_O.png");
+		s_FontSprites[15] = Sprite::Create("../VoltexEngine/textures/font/Font_P.png");
+		s_FontSprites[16] = Sprite::Create("../VoltexEngine/textures/font/Font_Q.png");
+		s_FontSprites[17] = Sprite::Create("../VoltexEngine/textures/font/Font_R.png");
+		s_FontSprites[18] = Sprite::Create("../VoltexEngine/textures/font/Font_S.png");
+		s_FontSprites[19] = Sprite::Create("../VoltexEngine/textures/font/Font_T.png");
+		s_FontSprites[20] = Sprite::Create("../VoltexEngine/textures/font/Font_U.png");
+		s_FontSprites[21] = Sprite::Create("../VoltexEngine/textures/font/Font_V.png");
+		s_FontSprites[22] = Sprite::Create("../VoltexEngine/textures/font/Font_W.png");
+		s_FontSprites[23] = Sprite::Create("../VoltexEngine/textures/font/Font_X.png");
+		s_FontSprites[24] = Sprite::Create("../VoltexEngine/textures/font/Font_Y.png");
+		s_FontSprites[25] = Sprite::Create("../VoltexEngine/textures/font/Font_Z.png");
 
 		// Bind input callbacks
 		glfwSetKeyCallback(s_Window, KeyCallback);
@@ -233,41 +235,6 @@ namespace VoltexEngine {
 
 		glfwSwapBuffers(currentWindow);
 		glfwPollEvents();
-	}
-
-	unsigned int Renderer::GenerateTexture(const std::string& texturePath, int* outWidth, int* outHeight)
-	{
-		// Load image pixels into array
-		int texWidth, texHeight, channels;
-		unsigned char* pixels = stbi_load(texturePath.c_str(), &texWidth, &texHeight, &channels, 0);
-
-		if (pixels == stbi__errpuc("can't fopen", "Unable to open file"))
-		{
-			VX_WARNING("Could not load texture: " + texturePath);
-			return 0;
-		}
-
-		// Generate the texture
-		GLuint texID;
-		glGenTextures(1, &texID);
-		glBindTexture(GL_TEXTURE_2D, texID);
-
-		// Set texture parameters
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-		// Load texture to graphics card
-		GLenum format = (channels == 3 ? GL_RGB : GL_RGBA);
-		glTexImage2D(GL_TEXTURE_2D, 0, format, texWidth, texHeight, 0, format, GL_UNSIGNED_BYTE, pixels);
-
-		*outWidth = texWidth;
-		*outHeight = texHeight;
-
-		VX_LOG("Loaded texture: " + texturePath);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		return texID;
 	}
 
 	void Renderer::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -476,6 +443,39 @@ namespace VoltexEngine {
 		Input::SetCursorPosition(xPos / s_WindowWidth, 1 - (yPos / s_WindowHeight));
 	}
 
+	void Renderer::HandleSpriteCreated(std::shared_ptr<Sprite> sprite, const std::string& texturePath)
+	{
+		// Load image pixels into array
+		int channels;
+		unsigned char* pixels = stbi_load(texturePath.c_str(), &sprite->PixelWidth, &sprite->PixelHeight, &channels, 0);
+
+		if (pixels == stbi__errpuc("can't fopen", "Unable to open file"))
+		{
+			VX_WARNING("Could not load texture: " + texturePath);
+			return;
+		}
+
+		// Generate the texture
+		GLuint texID;
+		glGenTextures(1, &texID);
+		glBindTexture(GL_TEXTURE_2D, texID);
+
+		// Set texture parameters
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+		// Load texture to graphics card
+		GLenum format = (channels == 3 ? GL_RGB : GL_RGBA);
+		glTexImage2D(GL_TEXTURE_2D, 0, format, sprite->PixelWidth, sprite->PixelHeight, 0, format, GL_UNSIGNED_BYTE, pixels);
+
+		s_SpriteMap[sprite] = texID;
+
+		VX_LOG("Loaded texture: " + texturePath);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
 	void Renderer::RenderGameObjects(const std::vector<std::shared_ptr<GameObject>>& gameObjects)
 	{
 		// Set the color on the fragment to white with full transparency
@@ -497,7 +497,7 @@ namespace VoltexEngine {
 				if (std::shared_ptr<Sprite> spr = sprComp->Sprite)
 				{
 					// Bind the texture for this sprite
-					glBindTexture(GL_TEXTURE_2D, spr->GetTextureID());
+					glBindTexture(GL_TEXTURE_2D, s_SpriteMap[spr]);
 
 					// Get the position, scale, and rotation of the game object
 					Vector position = obj->Position;
@@ -508,7 +508,7 @@ namespace VoltexEngine {
 					glm::mat4 modelMatrix = glm::mat4(1.0f);
 					modelMatrix = glm::translate(modelMatrix, glm::vec3(position.X, position.Y, depth));
 					modelMatrix = glm::rotate(modelMatrix, radianAngle, glm::vec3(0.0f, 0.0f, 1.0f));
-					modelMatrix = glm::scale(modelMatrix, glm::vec3((float)spr->GetWidth() / PPU, (float)spr->GetHeight() / PPU, 0.0f));
+					modelMatrix = glm::scale(modelMatrix, glm::vec3((float)spr->PixelWidth / PPU, (float)spr->PixelHeight / PPU, 0.0f));
 					GLint vertexModelMatrix = glGetUniformLocation(s_ShaderProgram, "modelMatrix");
 					glUniformMatrix4fv(vertexModelMatrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 
@@ -588,7 +588,7 @@ namespace VoltexEngine {
 						GLint vertexModelMatrix = glGetUniformLocation(s_ShaderProgram, "modelMatrix");
 						glUniformMatrix4fv(vertexModelMatrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));
 
-						glBindTexture(GL_TEXTURE_2D, s_FontTextureIDs[textGiz->Text[i] - 0x41]);
+						glBindTexture(GL_TEXTURE_2D, s_SpriteMap[s_FontSprites[textGiz->Text[i] - 0x41]]);
 						glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 					}
 
@@ -600,9 +600,9 @@ namespace VoltexEngine {
 
 			// Set the texture for this gizmo
 			if (giz->UISprite)
-				glBindTexture(GL_TEXTURE_2D, giz->UISprite->GetTextureID());
+				glBindTexture(GL_TEXTURE_2D, s_SpriteMap[giz->UISprite]);
 			else
-				glBindTexture(GL_TEXTURE_2D, s_DefaultUITextureID);
+				glBindTexture(GL_TEXTURE_2D, s_SpriteMap[s_DefaultUISprite]);
 
 			// Create and bind the model matrix
 			glm::mat4 modelMatrix = glm::mat4(1.0f);

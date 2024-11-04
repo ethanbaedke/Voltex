@@ -23,10 +23,23 @@ namespace VoltexEngine {
 
 		static GLuint s_ShaderProgram;
 
-		static GLuint s_DefaultUITextureID;
+		/* The following two structs and map are to hold generated sprites with their coresponding texture IDs */
+		struct SpriteHash {
+			std::size_t operator()(const std::shared_ptr<Sprite>& ptr) const {
+				return std::hash<std::uintptr_t>()(reinterpret_cast<std::uintptr_t>(ptr.get()));
+			}
+		};
+		struct SpriteEqual {
+			bool operator()(const std::shared_ptr<Sprite>& lhs, const std::shared_ptr<Sprite>& rhs) const {
+				return lhs.get() == rhs.get();
+			}
+		};
+		static std::unordered_map<std::shared_ptr<Sprite>, GLuint, SpriteHash, SpriteEqual> s_SpriteMap;
+
+		static std::shared_ptr<Sprite> s_DefaultUISprite;
 
 		/* A list containing the texture IDs of all the letters of the alphabet for text rendering */
-		static GLuint s_FontTextureIDs[26];
+		static std::shared_ptr<Sprite> s_FontSprites[26];
 
 	public:
 
@@ -35,9 +48,6 @@ namespace VoltexEngine {
 		/* Update all images on the screen */
 		static void Tick(const std::vector<std::shared_ptr<GameObject>>& gameObjects, std::vector<std::shared_ptr<Gizmo>> gizmos);
 
-		/* Reads the image at texture path, generates a texture, and returns its textureID */
-		static unsigned int GenerateTexture(const std::string& texturePath, int* outWidth, int* outHeight);
-
 		static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 		static void ClickCallback(GLFWwindow* window, int button, int action, int mods);
 		static void CursorCallback(GLFWwindow* window, double xPos, double yPos);
@@ -45,6 +55,8 @@ namespace VoltexEngine {
 		inline static bool GetCursorEnabled() { return glfwGetInputMode(s_Window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL; }
 
 	private:
+
+		static void HandleSpriteCreated(std::shared_ptr<Sprite> sprite, const std::string& texturePath);
 
 		static void RenderGameObjects(const std::vector<std::shared_ptr<GameObject>>& gameObjects);
 		static void RenderUI(std::vector<std::shared_ptr<Gizmo>> gizmos);

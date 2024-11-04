@@ -5,6 +5,8 @@
 
 namespace VoltexEngine {
 
+	Event_OneParam<std::shared_ptr<GameObject>> GameObject::OnCreated;
+
 	GameObject::GameObject()
 		: Position(Vector()), Angle(0.0f), Depth(0), m_Components(std::vector<std::shared_ptr<Component>>()), m_UninitializedComponents(std::vector<std::shared_ptr<Component>>())
 	{

@@ -14,8 +14,6 @@
 
 namespace VoltexEngine {
 
-	Application* Application::Current;
-
 	Application::Application()
 		: m_GameObjects(std::vector<std::shared_ptr<GameObject>>()), m_UninitializedGameObjects(std::vector<std::shared_ptr<GameObject>>())
 	{
@@ -25,7 +23,8 @@ namespace VoltexEngine {
 		if (!Renderer::Init(1280, 720))
 			return;
 
-		Current = this;
+		GameObject::OnCreated.AddCallback([&](std::shared_ptr<GameObject> obj) { HandleGameObjectCreated(obj); });
+		Gizmo::OnCreated.AddCallback([&](std::shared_ptr<Gizmo> giz) { HandleGizmoCreated(giz); });
 
 		VX_LOG("Application Initialized");
 	}
@@ -188,25 +187,13 @@ namespace VoltexEngine {
 				}
 			}
 
-			// Update UI, removing gizmos that are no longer root gizmos from the root gizmos list
-			for (std::shared_ptr<Gizmo> giz : m_RootGizmos)
-				giz->Tick();
+			// Update UI
+			for (int i = 0; i < m_RootGizmos.size(); i++)
+				m_RootGizmos[i]->Tick();
 
 			// Render, by the time we do this any expired game objects have been removed already
 			Renderer::Tick(m_GameObjects, m_RootGizmos);
 		}
-	}
-
-	std::shared_ptr<Sprite> Application::CreateSprite(const std::string& texturePath)
-	{
-		int width, height;
-		unsigned int textureID = Renderer::GenerateTexture(texturePath, &width, &height);
-
-		if (textureID == 0)
-			return std::shared_ptr<Sprite>(nullptr);
-
-		std::shared_ptr<Sprite> spr = std::make_shared<Sprite>(width, height, textureID);
-		return spr;
 	}
 
 	const char* Application::LoadFileDialog() const
@@ -219,6 +206,16 @@ namespace VoltexEngine {
 	{
 		const char* filter[] = {"*.bke"};
 		return tinyfd_saveFileDialog("Save File As", "../VoltexGame/rooms/NewRoom.bke", 1, filter, "BKE File");
+	}
+
+	void Application::HandleGameObjectCreated(std::shared_ptr<GameObject> obj)
+	{
+		m_UninitializedGameObjects.push_back(obj);
+	}
+
+	void Application::HandleGizmoCreated(std::shared_ptr<Gizmo> giz)
+	{
+		m_RootGizmos.push_back(giz);
 	}
 
 }

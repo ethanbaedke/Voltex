@@ -23,7 +23,7 @@ Level::Level(const Vector& position, Vector& size)
 	if (!s_LevelDataInitialized)
 	{
 		s_TileSprites.push_back(nullptr);
-		s_TileSprites.push_back(Application::Current->CreateSprite("../VoltexGame/textures/tiles/DirtBlock.png"));
+		s_TileSprites.push_back(Sprite::Create("../VoltexGame/textures/tiles/DirtBlock.png"));
 
 		for (const auto& entry : std::filesystem::directory_iterator("rooms/standard"))
 			s_StandardPaths.push_back(entry.path());
@@ -50,13 +50,13 @@ Level::Level(const Vector& position, Vector& size)
 	{
 		// Create an object for the tile, set its sprite, and position it in the world
 		// Do this for the top and bottom of the level
-		std::shared_ptr<GameObject> topObj = Application::Current->CreateObject<GameObject>();
+		std::shared_ptr<GameObject> topObj = GameObject::Create<GameObject>();
 		std::shared_ptr<SpriteComponent> topSprComp = topObj->AddComponent<SpriteComponent>();
 		topSprComp->Sprite = s_TileSprites[1];
 		topObj->AddComponent<CollisionComponent>();
 		topObj->Position.X = borderX;
 		topObj->Position.Y = position.Y + 1;
-		std::shared_ptr<GameObject> bottomObj = Application::Current->CreateObject<GameObject>();
+		std::shared_ptr<GameObject> bottomObj = GameObject::Create<GameObject>();
 		std::shared_ptr<SpriteComponent> bottomSprComp = bottomObj->AddComponent<SpriteComponent>();
 		bottomSprComp->Sprite = s_TileSprites[1];
 		bottomObj->AddComponent<CollisionComponent>();
@@ -67,13 +67,13 @@ Level::Level(const Vector& position, Vector& size)
 	{
 		// Create an object for the tile, set its sprite, and position it in the world
 		// Do this for the left and right sides of the level
-		std::shared_ptr<GameObject> leftObj = Application::Current->CreateObject<GameObject>();
+		std::shared_ptr<GameObject> leftObj = GameObject::Create<GameObject>();
 		std::shared_ptr<SpriteComponent> leftSprComp = leftObj->AddComponent<SpriteComponent>();
 		leftSprComp->Sprite = s_TileSprites[1];
 		leftObj->AddComponent<CollisionComponent>();
 		leftObj->Position.X = position.X - 1;
 		leftObj->Position.Y = borderY;
-		std::shared_ptr<GameObject> rightObj = Application::Current->CreateObject<GameObject>();
+		std::shared_ptr<GameObject> rightObj = GameObject::Create<GameObject>();
 		std::shared_ptr<SpriteComponent> rightSprComp = rightObj->AddComponent<SpriteComponent>();
 		rightSprComp->Sprite = s_TileSprites[1];
 		rightObj->AddComponent<CollisionComponent>();
@@ -136,7 +136,7 @@ Level::Level(const Vector& position, Vector& size)
 						continue;
 
 					// Create an object for the tile, set its sprite, and position it in the world
-					std::shared_ptr<GameObject> obj = Application::Current->CreateObject<GameObject>();
+					std::shared_ptr<GameObject> obj = GameObject::Create<GameObject>();
 					std::shared_ptr<SpriteComponent> sprComp = obj->AddComponent<SpriteComponent>();
 					sprComp->Sprite = s_TileSprites[byte];
 					obj->AddComponent<CollisionComponent>();

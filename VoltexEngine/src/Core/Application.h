@@ -13,10 +13,6 @@ namespace VoltexEngine {
 	class Application
 	{
 
-	public:
-
-		static Application* Current;
-
 	private:
 
 		/* All initialized game objects tracked by this application */
@@ -34,31 +30,14 @@ namespace VoltexEngine {
 
 		void Run();
 
-		/* Creates an returns a GameObject or any subclass of a GameObject */
-		template <typename T>
-		std::shared_ptr<T> CreateObject()
-		{
-			std::shared_ptr<T> obj = std::make_shared<T>();
-			m_UninitializedGameObjects.push_back(obj);
-			return obj;
-		}
-
-		/* Creates and returns a Sprite
-		   If there are any errors reading the texture, returns nullptr */
-		std::shared_ptr<Sprite> CreateSprite(const std::string& texturePath);
-
-		/* Creates and returns a Gizmo */
-		template <typename T>
-		std::shared_ptr<T> CreateGizmo()
-		{
-			std::shared_ptr<T> giz = std::make_shared<T>();
-			m_RootGizmos.push_back(giz);
-			return giz;
-		}
-
 		/* Opens dialogues where the user can select a file or folder and returns the selected path */
 		const char* LoadFileDialog() const;
 		const char* SaveFileDialog() const;
+
+	private:
+
+		void HandleGameObjectCreated(std::shared_ptr<GameObject> obj);
+		void HandleGizmoCreated(std::shared_ptr<Gizmo> giz);
 
 	};
 
