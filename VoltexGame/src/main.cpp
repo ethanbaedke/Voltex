@@ -67,7 +67,7 @@ private:
 
 	void OnCollisionCallback(std::shared_ptr<CollisionComponent> otherColComp)
 	{
-		VX_LOG("Player Collision Detected");
+		//VX_LOG("Player Collision Detected");
 	}
 
 };

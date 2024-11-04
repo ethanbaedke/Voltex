@@ -17,7 +17,9 @@ private:
 
 	static bool s_LevelDataInitialized;
 
-	static std::vector<std::shared_ptr<Sprite>> s_TileSprites;
+	static std::shared_ptr<Sprite> s_DirtBlockSprite;
+	static std::shared_ptr<Sprite> s_GrassBlockSprite;
+	static std::shared_ptr<Sprite> s_StoneBlockSprite;
 
 	/* List of file paths in each category of room */
 	static std::vector<std::filesystem::path> s_StandardPaths;

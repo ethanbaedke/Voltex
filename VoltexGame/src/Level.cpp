@@ -3,7 +3,9 @@
 #include <fstream>
 
 bool Level::s_LevelDataInitialized = false;
-std::vector<std::shared_ptr<Sprite>> Level::s_TileSprites;
+std::shared_ptr<Sprite> Level::s_DirtBlockSprite;
+std::shared_ptr<Sprite> Level::s_GrassBlockSprite;
+std::shared_ptr<Sprite> Level::s_StoneBlockSprite;
 std::vector<std::filesystem::path> Level::s_StandardPaths;
 std::vector<std::filesystem::path> Level::s_DropPaths;
 std::vector<std::filesystem::path> Level::s_CatchPaths;
@@ -22,8 +24,9 @@ Level::Level(const Vector& position, Vector& size)
 	// The first time we create a level, initialize data levels rely on like sprites and room file paths
 	if (!s_LevelDataInitialized)
 	{
-		s_TileSprites.push_back(nullptr);
-		s_TileSprites.push_back(Sprite::Create("../VoltexGame/textures/tiles/DirtBlock.png"));
+		s_DirtBlockSprite = Sprite::Create("textures/tiles/DirtBlock.png");
+		s_GrassBlockSprite = Sprite::Create("textures/tiles/GrassBlock.png");
+		s_StoneBlockSprite = Sprite::Create("textures/tiles/StoneBlock.png");
 
 		for (const auto& entry : std::filesystem::directory_iterator("rooms/standard"))
 			s_StandardPaths.push_back(entry.path());
@@ -52,13 +55,13 @@ Level::Level(const Vector& position, Vector& size)
 		// Do this for the top and bottom of the level
 		std::shared_ptr<GameObject> topObj = GameObject::Create<GameObject>();
 		std::shared_ptr<SpriteComponent> topSprComp = topObj->AddComponent<SpriteComponent>();
-		topSprComp->Sprite = s_TileSprites[1];
+		topSprComp->Sprite = s_StoneBlockSprite;
 		topObj->AddComponent<CollisionComponent>();
 		topObj->Position.X = borderX;
 		topObj->Position.Y = position.Y + 1;
 		std::shared_ptr<GameObject> bottomObj = GameObject::Create<GameObject>();
 		std::shared_ptr<SpriteComponent> bottomSprComp = bottomObj->AddComponent<SpriteComponent>();
-		bottomSprComp->Sprite = s_TileSprites[1];
+		bottomSprComp->Sprite = s_StoneBlockSprite;
 		bottomObj->AddComponent<CollisionComponent>();
 		bottomObj->Position.X = borderX;
 		bottomObj->Position.Y = position.Y - (size.Y * ROOM_HEIGHT);
@@ -69,13 +72,13 @@ Level::Level(const Vector& position, Vector& size)
 		// Do this for the left and right sides of the level
 		std::shared_ptr<GameObject> leftObj = GameObject::Create<GameObject>();
 		std::shared_ptr<SpriteComponent> leftSprComp = leftObj->AddComponent<SpriteComponent>();
-		leftSprComp->Sprite = s_TileSprites[1];
+		leftSprComp->Sprite = s_StoneBlockSprite;
 		leftObj->AddComponent<CollisionComponent>();
 		leftObj->Position.X = position.X - 1;
 		leftObj->Position.Y = borderY;
 		std::shared_ptr<GameObject> rightObj = GameObject::Create<GameObject>();
 		std::shared_ptr<SpriteComponent> rightSprComp = rightObj->AddComponent<SpriteComponent>();
-		rightSprComp->Sprite = s_TileSprites[1];
+		rightSprComp->Sprite = s_StoneBlockSprite;
 		rightObj->AddComponent<CollisionComponent>();
 		rightObj->Position.X = position.X + (size.Y * ROOM_WIDTH);
 		rightObj->Position.Y = borderY;
@@ -131,15 +134,29 @@ Level::Level(const Vector& position, Vector& size)
 					unsigned char byte;
 					file.read(reinterpret_cast<char*>(&byte), sizeof(byte));
 
-					// Skip the tile if its empty
 					if (byte == 0x00)
 						continue;
 
-					// Create an object for the tile, set its sprite, and position it in the world
+					// Create an object for the tile
 					std::shared_ptr<GameObject> obj = GameObject::Create<GameObject>();
 					std::shared_ptr<SpriteComponent> sprComp = obj->AddComponent<SpriteComponent>();
-					sprComp->Sprite = s_TileSprites[byte];
 					obj->AddComponent<CollisionComponent>();
+
+					// Set its sprite
+					switch (byte)
+					{
+					case 0x01:
+						sprComp->Sprite = s_DirtBlockSprite;
+						break;
+					case 0x02:
+						sprComp->Sprite = s_GrassBlockSprite;
+						break;
+					case 0x03:
+						sprComp->Sprite = s_StoneBlockSprite;
+						break;
+					}
+
+					// Set its position in the world
 					obj->Position.X = xOffset + x;
 					obj->Position.Y = yOffset - y;
 				}

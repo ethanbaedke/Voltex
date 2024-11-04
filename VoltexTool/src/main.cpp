@@ -6,6 +6,7 @@
 using namespace VoltexEngine;
 
 static std::vector<std::shared_ptr<Sprite>> TileSprites;
+static int SelectionIndex = 0;
 
 class RoomTile : public ButtonGizmo
 {
@@ -33,10 +34,7 @@ private:
 
 	void HandleButtonPressed()
 	{
-		if (TileIndex < TileSprites.size() - 1)
-			TileIndex++;
-		else
-			TileIndex = 0;
+		TileIndex = SelectionIndex;
 	}
 
 };
@@ -56,10 +54,11 @@ private:
 public:
 
 	Tool()
-		: m_RoomEditor(nullptr)
 	{
 		TileSprites.push_back(nullptr);
-		TileSprites.push_back(Sprite::Create("../VoltexGame/textures/tiles/DirtBlock.png"));
+		TileSprites.push_back(Sprite::Create("textures/DirtBlock.png"));
+		TileSprites.push_back(Sprite::Create("textures/GrassBlock.png"));
+		TileSprites.push_back(Sprite::Create("textures/StoneBlock.png"));
 
 		// Make the base gizmo that will hold all other gizmos
 		std::shared_ptr<HorizontalLayoutGizmo> canvas = Gizmo::Create<HorizontalLayoutGizmo>();
@@ -69,10 +68,12 @@ public:
 		canvas->AddChild(tileSelector);
 
 		// Populate tile selection with buttons
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < 4; i++)
 		{
 			std::shared_ptr<ButtonGizmo> selectionTile = Gizmo::Create<ButtonGizmo>();
 			tileSelector->AddChild(selectionTile);
+			selectionTile->UISprite = TileSprites[i];
+			selectionTile->OnButtonPressed.AddCallback([&, i] { Select(i); });
 		}
 
 		// Layout to hold the room editor and save/load buttons on the right side of the screen
@@ -178,6 +179,11 @@ private:
 
 		file.close();
 		VX_LOG("Loaded room from file: " + filePath);
+	}
+
+	void Select(int index)
+	{
+		SelectionIndex = index;
 	}
 
 };
