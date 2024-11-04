@@ -38,10 +38,10 @@ namespace VoltexEngine {
 		/* How much space this element should take up relative to its siblings if in a weighted layout */
 		unsigned int Weight;
 
-		/* How far back or forward this element should be rendered */
+		/* This variable is handeled by the UI system. How far back or forward this element should be rendered */
 		int Depth;
 
-		/* Whether this gizmo is a top level gizmo or a child of a top level gizmo */
+		/* This variable is handeled by the UI system. Whether this gizmo is a top level gizmo or a child of a top level gizmo */
 		bool IsRoot;
 
 	protected:

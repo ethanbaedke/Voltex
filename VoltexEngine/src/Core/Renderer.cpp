@@ -577,13 +577,16 @@ namespace VoltexEngine {
 			else if (std::shared_ptr<TextGizmo> textGiz = std::dynamic_pointer_cast<TextGizmo>(giz))
 			{
 				int len = textGiz->Text.length();
-				xS /= textGiz->Text.length();
+				xS /= (textGiz->Text.length() + 2);
+				float ySMod = yS - (xS * (10.0f / 3.0f));
+				yS -= ySMod;
 				for (int i = 0; i < textGiz->Text.length(); i++)
 				{
+					xP += xS;
 					if ((textGiz->Text[i] > 0x40 && textGiz->Text[i] < 0x5B))
 					{
 						glm::mat4 modelMatrix = glm::mat4(1.0f);
-						modelMatrix = glm::translate(modelMatrix, glm::vec3((2.0f * xP) + xS - 1.0f, (2.0f * yP) + yS - 1.0f, giz->Depth));
+						modelMatrix = glm::translate(modelMatrix, glm::vec3((2.0f * xP) + xS - 1.0f, (2.0f * yP) + yS - 1.0f + ySMod, giz->Depth));
 						modelMatrix = glm::scale(modelMatrix, glm::vec3(xS * 2.0f, yS * 2.0f, 1.0f));
 						GLint vertexModelMatrix = glGetUniformLocation(s_ShaderProgram, "modelMatrix");
 						glUniformMatrix4fv(vertexModelMatrix, 1, GL_FALSE, glm::value_ptr(modelMatrix));
@@ -591,8 +594,6 @@ namespace VoltexEngine {
 						glBindTexture(GL_TEXTURE_2D, s_SpriteMap[s_FontSprites[textGiz->Text[i] - 0x41]]);
 						glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 					}
-
-					xP += xS;
 				}
 				// We do this because we dont want to render the text gizmo itself, just the text it holds
 				continue;
