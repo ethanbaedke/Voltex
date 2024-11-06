@@ -14,12 +14,13 @@ std::vector<std::filesystem::path> Level::s_EndPaths;
 std::mt19937 Level::s_RandomGenerator;
 
 Level::Level(const Vector& position, Vector& size)
+	: m_Postion(position), m_Size(size)
 {
 	// Make sure our level is at least 2x2
-	if (size.X < 2)
-		size.X = 2;
-	if (size.Y < 2)
-		size.Y = 2;
+	if (m_Size.X < 2)
+		m_Size.X = 2;
+	if (m_Size.Y < 2)
+		m_Size.Y = 2;
 
 	// The first time we create a level, initialize data levels rely on like sprites and room file paths
 	if (!s_LevelDataInitialized)
@@ -44,12 +45,12 @@ Level::Level(const Vector& position, Vector& size)
 
 		s_LevelDataInitialized = true;
 	}
+}
 
-	int xOffset = position.X;
-	int yOffset = position.Y;
-
+Vector Level::Generate()
+{
 	// Build the border
-	for (int borderX = position.X - 1; borderX < ((position.X + (size.X * ROOM_WIDTH)) + 1); borderX++)
+	for (int borderX = m_Postion.X - 1; borderX < ((m_Postion.X + (m_Size.X * ROOM_WIDTH)) + 1); borderX++)
 	{
 		// Create an object for the tile, set its sprite, and position it in the world
 		// Do this for the top and bottom of the level
@@ -58,15 +59,15 @@ Level::Level(const Vector& position, Vector& size)
 		topSprComp->Sprite = s_StoneBlockSprite;
 		topObj->AddComponent<CollisionComponent>();
 		topObj->Position.X = borderX;
-		topObj->Position.Y = position.Y + 1;
+		topObj->Position.Y = m_Postion.Y + 1;
 		std::shared_ptr<GameObject> bottomObj = GameObject::Create<GameObject>();
 		std::shared_ptr<SpriteComponent> bottomSprComp = bottomObj->AddComponent<SpriteComponent>();
 		bottomSprComp->Sprite = s_StoneBlockSprite;
 		bottomObj->AddComponent<CollisionComponent>();
 		bottomObj->Position.X = borderX;
-		bottomObj->Position.Y = position.Y - (size.Y * ROOM_HEIGHT);
+		bottomObj->Position.Y = m_Postion.Y - (m_Size.Y * ROOM_HEIGHT);
 	}
-	for (int borderY = position.Y; borderY > position.Y - (size.Y * ROOM_HEIGHT); borderY--)
+	for (int borderY = m_Postion.Y; borderY > m_Postion.Y - (m_Size.Y * ROOM_HEIGHT); borderY--)
 	{
 		// Create an object for the tile, set its sprite, and position it in the world
 		// Do this for the left and right sides of the level
@@ -74,26 +75,30 @@ Level::Level(const Vector& position, Vector& size)
 		std::shared_ptr<SpriteComponent> leftSprComp = leftObj->AddComponent<SpriteComponent>();
 		leftSprComp->Sprite = s_StoneBlockSprite;
 		leftObj->AddComponent<CollisionComponent>();
-		leftObj->Position.X = position.X - 1;
+		leftObj->Position.X = m_Postion.X - 1;
 		leftObj->Position.Y = borderY;
 		std::shared_ptr<GameObject> rightObj = GameObject::Create<GameObject>();
 		std::shared_ptr<SpriteComponent> rightSprComp = rightObj->AddComponent<SpriteComponent>();
 		rightSprComp->Sprite = s_StoneBlockSprite;
 		rightObj->AddComponent<CollisionComponent>();
-		rightObj->Position.X = position.X + (size.Y * ROOM_WIDTH);
+		rightObj->Position.X = m_Postion.X + (m_Size.Y * ROOM_WIDTH);
 		rightObj->Position.Y = borderY;
 	}
 
 	// Get the room codes
-	std::vector<int> roomCodes = GenerateLevel(Vector(size.X, size.Y));
+	std::vector<int> roomCodes = GenerateMap(Vector(m_Size.X, m_Size.Y));
+
+	int xOffset = m_Postion.X;
+	int yOffset = m_Postion.Y;
+	Vector spawnPoint;
 
 	// Build the rooms
-	for (int levelY = 0; levelY < size.Y; levelY++)
+	for (int levelY = 0; levelY < m_Size.Y; levelY++)
 	{
-		for (int levelX = 0; levelX < size.X; levelX++)
+		for (int levelX = 0; levelX < m_Size.X; levelX++)
 		{
 			std::vector<std::filesystem::path>* filePathList;
-			switch (roomCodes[levelX + (size.X * levelY)])
+			switch (roomCodes[levelX + (m_Size.X * levelY)])
 			{
 			case 0:
 				filePathList = &s_StandardPaths;
@@ -106,6 +111,7 @@ Level::Level(const Vector& position, Vector& size)
 				break;
 			case 3:
 				filePathList = &s_StartPaths;
+				spawnPoint = Vector(xOffset + (ROOM_WIDTH / 2) - 0.5f, yOffset - ROOM_HEIGHT + 2.5f);
 				break;
 			case 4:
 				filePathList = &s_EndPaths;
@@ -122,7 +128,7 @@ Level::Level(const Vector& position, Vector& size)
 			if (!file)
 			{
 				VX_ERROR("Could not read file at location: " + filePath);
-				return;
+				return Vector();
 			}
 
 			// Build the room from the room file
@@ -166,12 +172,14 @@ Level::Level(const Vector& position, Vector& size)
 
 			xOffset += ROOM_WIDTH;
 		}
-		xOffset = position.X;
+		xOffset = m_Postion.X;
 		yOffset -= ROOM_HEIGHT;
 	}
+
+	return spawnPoint;
 }
 
-std::vector<int> Level::GenerateLevel(Vector size)
+std::vector<int> Level::GenerateMap(Vector size)
 {
 	std::vector<int> codes = std::vector<int>(size.X * size.Y);
 	std::uniform_int_distribution<> distr(0, size.X - 1);

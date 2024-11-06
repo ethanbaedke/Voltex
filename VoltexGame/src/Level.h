@@ -30,9 +30,16 @@ private:
 
 	static std::mt19937 s_RandomGenerator;
 
+private:
+
+	Vector m_Postion;
+	Vector m_Size;
+
 public:
 
 	Level(const Vector& position, Vector& size);
+
+	Vector Generate();
 
 private:
 
@@ -44,7 +51,7 @@ private:
 	* 3 - the start room
 	* 4 - the end room
 	*/
-	std::vector<int> GenerateLevel(Vector size);
+	std::vector<int> GenerateMap(Vector size);
 
 };
 

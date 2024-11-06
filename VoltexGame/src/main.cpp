@@ -84,7 +84,9 @@ public:
 
 		// Create a level
 		Level level(Vector(0, 0), Vector(4, 4));
+		Vector startPos = level.Generate();
 		std::shared_ptr<Player> player = GameObject::Create<Player>();
+		player->Position = startPos;
 		player->Depth = 1;
 	}
 
