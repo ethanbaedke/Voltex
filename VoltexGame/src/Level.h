@@ -39,7 +39,7 @@ public:
 
 	Level(const Vector& position, Vector& size);
 
-	Vector Generate();
+	void Generate(Vector* outStartPos, Vector* outEndPos);
 
 private:
 

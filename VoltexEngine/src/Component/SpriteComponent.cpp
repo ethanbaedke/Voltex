@@ -4,7 +4,7 @@
 namespace VoltexEngine {
 
 	SpriteComponent::SpriteComponent()
-		: Component(), Sprite(nullptr)
+		: Component(), Tint(Color(255, 255, 255, 255)), Sprite(nullptr)
 	{
 	}
 

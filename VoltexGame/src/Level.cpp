@@ -47,7 +47,7 @@ Level::Level(const Vector& position, Vector& size)
 	}
 }
 
-Vector Level::Generate()
+void Level::Generate(Vector* outStartPos, Vector* outEndPos)
 {
 	// Build the border
 	for (int borderX = m_Postion.X - 1; borderX < ((m_Postion.X + (m_Size.X * ROOM_WIDTH)) + 1); borderX++)
@@ -111,10 +111,11 @@ Vector Level::Generate()
 				break;
 			case 3:
 				filePathList = &s_StartPaths;
-				spawnPoint = Vector(xOffset + (ROOM_WIDTH / 2) - 0.5f, yOffset - ROOM_HEIGHT + 2.5f);
+				*outStartPos = Vector(xOffset + (ROOM_WIDTH / 2) - 0.5f, yOffset - ROOM_HEIGHT + 2.5f);
 				break;
 			case 4:
 				filePathList = &s_EndPaths;
+				*outEndPos = Vector(xOffset + (ROOM_WIDTH / 2) - 0.5f, yOffset - ROOM_HEIGHT + 2.5f);
 				break;
 			default:
 				filePathList = &s_StandardPaths;
@@ -128,7 +129,7 @@ Vector Level::Generate()
 			if (!file)
 			{
 				VX_ERROR("Could not read file at location: " + filePath);
-				return Vector();
+				return;
 			}
 
 			// Build the room from the room file
@@ -175,8 +176,6 @@ Vector Level::Generate()
 		xOffset = m_Postion.X;
 		yOffset -= ROOM_HEIGHT;
 	}
-
-	return spawnPoint;
 }
 
 std::vector<int> Level::GenerateMap(Vector size)

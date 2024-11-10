@@ -3,6 +3,7 @@
 
 #include "Component.h"
 #include "Core/Sprite.h"
+#include "Core/Color.h"
 
 namespace VoltexEngine {
 
@@ -12,6 +13,9 @@ namespace VoltexEngine {
 	public:
 
 		std::shared_ptr<Sprite> Sprite;
+
+		/* Tint of the sprite */
+		Color Tint;
 
 	public:
 

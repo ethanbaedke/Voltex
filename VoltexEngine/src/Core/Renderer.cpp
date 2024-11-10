@@ -499,6 +499,10 @@ namespace VoltexEngine {
 					// Bind the texture for this sprite
 					glBindTexture(GL_TEXTURE_2D, s_SpriteMap[spr]);
 
+					// Set the tint color on the fragment shader
+					GLint fragmentColor = glGetUniformLocation(s_ShaderProgram, "color");
+					glUniform4f(fragmentColor, sprComp->Tint.R / 255.0f, sprComp->Tint.G / 255.0f, sprComp->Tint.B / 255.0f, sprComp->Tint.A / 255.0f);
+
 					// Get the position, scale, and rotation of the game object
 					Vector position = obj->Position;
 					float radianAngle = glm::radians(obj->Angle);

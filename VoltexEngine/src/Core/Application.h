@@ -15,6 +15,8 @@ namespace VoltexEngine {
 
 	private:
 
+		static Application* s_Current;
+
 		/* All initialized game objects tracked by this application */
 		std::vector<std::shared_ptr<GameObject>> m_GameObjects;
 
@@ -26,6 +28,8 @@ namespace VoltexEngine {
 
 	public:
 
+		static std::shared_ptr<GameObject> OverlapPoint(const Vector& point);
+
 		Application();
 
 		void Run();
@@ -36,6 +40,7 @@ namespace VoltexEngine {
 
 	private:
 
+		/* Event handlers */
 		void HandleGameObjectCreated(std::shared_ptr<GameObject> obj);
 		void HandleGizmoCreated(std::shared_ptr<Gizmo> giz);
 

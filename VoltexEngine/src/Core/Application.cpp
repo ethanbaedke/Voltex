@@ -14,9 +14,40 @@
 
 namespace VoltexEngine {
 
-	Application::Application()
-		: m_GameObjects(std::vector<std::shared_ptr<GameObject>>()), m_UninitializedGameObjects(std::vector<std::shared_ptr<GameObject>>())
+	Application* Application::s_Current;
+
+	std::shared_ptr<GameObject> Application::OverlapPoint(const Vector& point)
 	{
+		std::shared_ptr<GameObject> hit;
+		for (std::shared_ptr<GameObject> obj : s_Current->m_GameObjects)
+		{
+			if (std::shared_ptr<CollisionComponent> colComp = obj->GetComponent<CollisionComponent>())
+			{
+				// Get the bottom left and top right coordinates of the objects collision component
+				Vector bl = obj->Position - (colComp->Size / 2);
+				Vector tr = obj->Position + (colComp->Size / 2);
+
+				if (point.X >= tr.X || point.X <= bl.X || point.Y >= tr.Y || point.Y <= bl.Y)
+					continue;
+				else if (!hit)
+					hit = obj;
+				else if (obj->Depth > hit->Depth)
+					hit = obj;
+			}
+		}
+		return hit;
+	}
+
+	Application::Application()
+	{
+		if (!s_Current)
+			s_Current = this;
+		else
+		{
+			VX_ERROR("Voltex only supports the creation of one application");
+			return;
+		}
+
 		if (!Input::Init())
 			return;
 

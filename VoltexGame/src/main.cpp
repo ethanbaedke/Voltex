@@ -1,6 +1,7 @@
 #include <VXCore.h>
 
 #include "Level.h"
+#include "Pathfinder.h"
 
 using namespace VoltexEngine;
 
@@ -67,7 +68,37 @@ private:
 
 	void OnCollisionCallback(std::shared_ptr<CollisionComponent> otherColComp)
 	{
-		//VX_LOG("Player Collision Detected");
+		VX_LOG("Player Collision Detected");
+	}
+
+};
+
+class AIActor : public GameObject
+{
+
+private:
+
+	Vector m_StartPos;
+	Vector m_EndPos;
+
+	bool m_Generated = false;
+
+public:
+
+	virtual void Update(float deltaTime) override
+	{
+		if (!m_Generated && Input::KeyDown(KeyCode::Space))
+		{
+			Pathfinder pf = Pathfinder(Vector(0, -39.0f), Vector(79.0f, 0.0f), 1.0f);
+			pf.DepthFirst(m_StartPos, m_EndPos);
+			m_Generated = true;
+		}
+	}
+
+	void SetPath(const Vector& startPos, const Vector& endPos)
+	{
+		m_StartPos = startPos;
+		m_EndPos = endPos;
 	}
 
 };
@@ -84,10 +115,17 @@ public:
 
 		// Create a level
 		Level level(Vector(0, 0), Vector(4, 4));
-		Vector startPos = level.Generate();
-		std::shared_ptr<Player> player = GameObject::Create<Player>();
-		player->Position = startPos;
-		player->Depth = 1;
+		Vector startPos, endPos;
+		level.Generate(&startPos, &endPos);
+
+		// Create player
+		//std::shared_ptr<Player> player = GameObject::Create<Player>();
+		//player->Position = startPos;
+		//player->Depth = 1;
+
+		// Create AI actor
+		std::shared_ptr<AIActor> aiActor = GameObject::Create<AIActor>();
+		aiActor->SetPath(startPos, endPos);
 	}
 
 };
