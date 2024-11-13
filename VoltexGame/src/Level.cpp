@@ -5,7 +5,10 @@
 bool Level::s_LevelDataInitialized = false;
 std::shared_ptr<Sprite> Level::s_DirtBlockSprite;
 std::shared_ptr<Sprite> Level::s_GrassBlockSprite;
-std::shared_ptr<Sprite> Level::s_StoneBlockSprite;
+std::shared_ptr<Sprite> Level::s_LogDecorSprite;
+std::shared_ptr<Sprite> Level::s_VineDecorSprite;
+std::shared_ptr<Sprite> Level::s_SlimeEnemySprite;
+std::shared_ptr<Sprite> Level::s_BeeEnemySprite;
 std::vector<std::filesystem::path> Level::s_StandardPaths;
 std::vector<std::filesystem::path> Level::s_DropPaths;
 std::vector<std::filesystem::path> Level::s_CatchPaths;
@@ -27,7 +30,10 @@ Level::Level(const Vector& position, Vector& size)
 	{
 		s_DirtBlockSprite = Sprite::Create("textures/tiles/DirtBlock.png");
 		s_GrassBlockSprite = Sprite::Create("textures/tiles/GrassBlock.png");
-		s_StoneBlockSprite = Sprite::Create("textures/tiles/StoneBlock.png");
+		s_LogDecorSprite = Sprite::Create("textures/tiles/LogDecor.png");
+		s_VineDecorSprite = Sprite::Create("textures/tiles/VineDecor.png");
+		s_SlimeEnemySprite = Sprite::Create("textures/tiles/SlimeEnemy.png");
+		s_BeeEnemySprite = Sprite::Create("textures/tiles/BeeEnemy.png");
 
 		for (const auto& entry : std::filesystem::directory_iterator("rooms/standard"))
 			s_StandardPaths.push_back(entry.path());
@@ -56,13 +62,13 @@ void Level::Generate(Vector* outStartPos, Vector* outEndPos)
 		// Do this for the top and bottom of the level
 		std::shared_ptr<GameObject> topObj = GameObject::Create<GameObject>();
 		std::shared_ptr<SpriteComponent> topSprComp = topObj->AddComponent<SpriteComponent>();
-		topSprComp->Sprite = s_StoneBlockSprite;
+		topSprComp->Sprite = s_DirtBlockSprite;
 		topObj->AddComponent<CollisionComponent>();
 		topObj->Position.X = borderX;
 		topObj->Position.Y = m_Postion.Y + 1;
 		std::shared_ptr<GameObject> bottomObj = GameObject::Create<GameObject>();
 		std::shared_ptr<SpriteComponent> bottomSprComp = bottomObj->AddComponent<SpriteComponent>();
-		bottomSprComp->Sprite = s_StoneBlockSprite;
+		bottomSprComp->Sprite = s_DirtBlockSprite;
 		bottomObj->AddComponent<CollisionComponent>();
 		bottomObj->Position.X = borderX;
 		bottomObj->Position.Y = m_Postion.Y - (m_Size.Y * ROOM_HEIGHT);
@@ -73,13 +79,13 @@ void Level::Generate(Vector* outStartPos, Vector* outEndPos)
 		// Do this for the left and right sides of the level
 		std::shared_ptr<GameObject> leftObj = GameObject::Create<GameObject>();
 		std::shared_ptr<SpriteComponent> leftSprComp = leftObj->AddComponent<SpriteComponent>();
-		leftSprComp->Sprite = s_StoneBlockSprite;
+		leftSprComp->Sprite = s_DirtBlockSprite;
 		leftObj->AddComponent<CollisionComponent>();
 		leftObj->Position.X = m_Postion.X - 1;
 		leftObj->Position.Y = borderY;
 		std::shared_ptr<GameObject> rightObj = GameObject::Create<GameObject>();
 		std::shared_ptr<SpriteComponent> rightSprComp = rightObj->AddComponent<SpriteComponent>();
-		rightSprComp->Sprite = s_StoneBlockSprite;
+		rightSprComp->Sprite = s_DirtBlockSprite;
 		rightObj->AddComponent<CollisionComponent>();
 		rightObj->Position.X = m_Postion.X + (m_Size.Y * ROOM_WIDTH);
 		rightObj->Position.Y = borderY;
@@ -144,6 +150,14 @@ void Level::Generate(Vector* outStartPos, Vector* outEndPos)
 					if (byte == 0x00)
 						continue;
 
+					// 50% chance to skip object creation on a chance tile
+					if (byte > 0x02)
+					{
+						std::uniform_int_distribution<> distr(0, 1);
+						if (distr(s_RandomGenerator) == 0)
+							continue;
+					}
+
 					// Create an object for the tile
 					std::shared_ptr<GameObject> obj = GameObject::Create<GameObject>();
 					std::shared_ptr<SpriteComponent> sprComp = obj->AddComponent<SpriteComponent>();
@@ -159,7 +173,22 @@ void Level::Generate(Vector* outStartPos, Vector* outEndPos)
 						sprComp->Sprite = s_GrassBlockSprite;
 						break;
 					case 0x03:
-						sprComp->Sprite = s_StoneBlockSprite;
+						sprComp->Sprite = s_DirtBlockSprite;
+						break;
+					case 0x04:
+						sprComp->Sprite = s_GrassBlockSprite;
+						break;
+					case 0x05:
+						sprComp->Sprite = s_LogDecorSprite;
+						break;
+					case 0x06:
+						sprComp->Sprite = s_VineDecorSprite;
+						break;
+					case 0x07:
+						sprComp->Sprite = s_SlimeEnemySprite;
+						break;
+					case 0x08:
+						sprComp->Sprite = s_BeeEnemySprite;
 						break;
 					}
 

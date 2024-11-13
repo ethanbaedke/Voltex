@@ -19,7 +19,10 @@ private:
 
 	static std::shared_ptr<Sprite> s_DirtBlockSprite;
 	static std::shared_ptr<Sprite> s_GrassBlockSprite;
-	static std::shared_ptr<Sprite> s_StoneBlockSprite;
+	static std::shared_ptr<Sprite> s_LogDecorSprite;
+	static std::shared_ptr<Sprite> s_VineDecorSprite;
+	static std::shared_ptr<Sprite> s_SlimeEnemySprite;
+	static std::shared_ptr<Sprite> s_BeeEnemySprite;
 
 	/* List of file paths in each category of room */
 	static std::vector<std::filesystem::path> s_StandardPaths;

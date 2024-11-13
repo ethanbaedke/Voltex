@@ -58,7 +58,12 @@ public:
 		TileSprites.push_back(nullptr);
 		TileSprites.push_back(Sprite::Create("textures/DirtBlock.png"));
 		TileSprites.push_back(Sprite::Create("textures/GrassBlock.png"));
-		TileSprites.push_back(Sprite::Create("textures/StoneBlock.png"));
+		TileSprites.push_back(Sprite::Create("textures/c_DirtBlock.png"));
+		TileSprites.push_back(Sprite::Create("textures/c_GrassBlock.png"));
+		TileSprites.push_back(Sprite::Create("textures/c_LogDecor.png"));
+		TileSprites.push_back(Sprite::Create("textures/c_VineDecor.png"));
+		TileSprites.push_back(Sprite::Create("textures/c_SlimeEnemy.png"));
+		TileSprites.push_back(Sprite::Create("textures/c_BeeEnemy.png"));
 
 		// Make the base gizmo that will hold all other gizmos
 		std::shared_ptr<HorizontalLayoutGizmo> canvas = Gizmo::Create<HorizontalLayoutGizmo>();
@@ -68,7 +73,7 @@ public:
 		canvas->AddChild(tileSelector);
 
 		// Populate tile selection with buttons
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 9; i++)
 		{
 			std::shared_ptr<ButtonGizmo> selectionTile = Gizmo::Create<ButtonGizmo>();
 			tileSelector->AddChild(selectionTile);
