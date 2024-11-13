@@ -128,6 +128,12 @@ void Level::Generate(Vector* outStartPos, Vector* outEndPos)
 				break;
 			}
 
+			if (filePathList->size() == 0)
+			{
+				VX_ERROR("One of the room folders needed to be accessed but contained no contents");
+				continue;
+			}
+
 			std::uniform_int_distribution<> distr(0, filePathList->size() - 1);
 			std::string filePath = (*filePathList)[distr(s_RandomGenerator)].string();
 			std::ifstream file(filePath, std::ios::binary);
