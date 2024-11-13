@@ -223,7 +223,8 @@ namespace VoltexEngine {
 				m_RootGizmos[i]->Tick();
 
 			// Render, by the time we do this any expired game objects have been removed already
-			Renderer::Tick(m_GameObjects, m_RootGizmos);
+			if (!Renderer::Tick(m_GameObjects, m_RootGizmos))
+				break;
 		}
 	}
 

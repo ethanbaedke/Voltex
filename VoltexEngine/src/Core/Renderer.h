@@ -46,7 +46,7 @@ namespace VoltexEngine {
 		static bool Init(int windowWidth, int windowHeight);
 
 		/* Update all images on the screen */
-		static void Tick(const std::vector<std::shared_ptr<GameObject>>& gameObjects, std::vector<std::shared_ptr<Gizmo>> gizmos);
+		static bool Tick(const std::vector<std::shared_ptr<GameObject>>& gameObjects, std::vector<std::shared_ptr<Gizmo>> gizmos);
 
 		static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 		static void ClickCallback(GLFWwindow* window, int button, int action, int mods);

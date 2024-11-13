@@ -211,20 +211,17 @@ namespace VoltexEngine {
 		return true;
 	}
 
-	void Renderer::Tick(const std::vector<std::shared_ptr<GameObject>>& gameObjects, std::vector<std::shared_ptr<Gizmo>> rootGizmos)
+	bool Renderer::Tick(const std::vector<std::shared_ptr<GameObject>>& gameObjects, std::vector<std::shared_ptr<Gizmo>> rootGizmos)
 	{
 		GLFWwindow* currentWindow = glfwGetCurrentContext();
 
 		if (!currentWindow)
 		{
 			VX_ERROR("GLFW window does not exist");
-			return;
+			return false;
 		}
 		else if (glfwWindowShouldClose(currentWindow))
-		{
-			VX_ERROR("GLFW window should close");
-			return;
-		}
+			return false;
 
 		glClearColor(0.13f, 0.16f, 0.27f, 1.0f); // Navy blue
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -235,6 +232,8 @@ namespace VoltexEngine {
 
 		glfwSwapBuffers(currentWindow);
 		glfwPollEvents();
+
+		return true;
 	}
 
 	void Renderer::KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
