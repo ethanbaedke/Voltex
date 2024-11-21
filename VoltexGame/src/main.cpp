@@ -90,7 +90,7 @@ public:
 		if (!m_Generated && Input::KeyDown(KeyCode::Space))
 		{
 			Pathfinder pf = Pathfinder(Vector(0, -39.0f), Vector(79.0f, 0.0f), 1.0f);
-			pf.DepthFirst(m_StartPos, m_EndPos);
+			pf.AStar(m_StartPos, m_EndPos);
 			m_Generated = true;
 		}
 	}
